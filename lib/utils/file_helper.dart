@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:asset_doctor/model/asset_file.dart';
 import 'package:path/path.dart' as p;
 
 class FileHelper {
@@ -37,13 +38,91 @@ class FileHelper {
     for (var dir in commonAssetLocations) {
       final safeDir = Directory(p.join(projectRoot, dir));
       try {
-        if (!safeDir.existsSync()) break;
+        if (!safeDir.existsSync()) continue;
         files.addAll(findAllFilesInDirectory(projectRoot, safeDir));
       } catch (e) {
         print('⚠️ Error listing files in ${safeDir.path}: $e');
       }
     }
     return files;
+  }
+
+  static Set<String> findAllStringLiteralsInCode(
+      Directory dir, String projectRoot, List<String> ignoredDirs) {
+    final allNormalizedLiterals = <String>{};
+    final stringLiteralRegex = RegExp(
+        '\'(?:[^\\\'\\\\]|\\\\.)*\\\'|\\"(?:[^\\"\\\\]|\\\\.)*\\"|r\'[^\\\']*\\\'|r"[^\\"]*\\""',
+        multiLine: true);
+    void checkFile(File file) {
+      try {
+        final content = file.readAsStringSync();
+        final matches = stringLiteralRegex.allMatches(content);
+        for (var match in matches) {
+          String literal = match.group(0)!;
+          String? normalized = _normalizeStringLiteral(literal);
+          if (normalized != null && normalized.isNotEmpty) {
+            allNormalizedLiterals.add(normalized);
+          }
+        }
+      } catch (e) {
+        print('⚠️ Error reading file ${file.path}: $e');
+      }
+    }
+
+    if (dir.existsSync()) {
+      try {
+        for (var entity in dir.listSync(recursive: true)) {
+          if (entity is File &&
+              entity.path.endsWith('.dart') &&
+              !_shouldIgnore(entity, projectRoot, ignoredDirs)) {
+            checkFile(entity);
+          }
+        }
+      } catch (e) {
+        print('⚠️ Error traversing directory ${dir.path}: $e');
+      }
+    } else {
+      print('⚠️ Lib directory not found at ${dir.path}');
+    }
+    return allNormalizedLiterals;
+  }
+
+  static String? _normalizeStringLiteral(String literal) {
+    if (literal.isEmpty) return null;
+    String? content;
+    if (literal.startsWith('r')) {
+      if (literal.length >= 3) {
+        content = literal.substring(2, literal.length - 1);
+      }
+    } else if ((literal.startsWith("'") && literal.endsWith("'")) ||
+        (literal.startsWith('"') && literal.endsWith('"'))) {
+      if (literal.length >= 2) {
+        content = literal.substring(1, literal.length - 1);
+      }
+    }
+    return content?.trim();
+  }
+
+  static bool _shouldIgnore(
+      File file, String projectRoot, List<String> ignoredDirs) {
+    final filePath = file.path.replaceAll('\\', '/');
+    final rootPath = projectRoot.replaceAll('\\', '/');
+    return ignoredDirs.any((dir) {
+      final ignoredPath = p.join(rootPath, dir).replaceAll('\\', '/');
+      return filePath.contains(ignoredPath);
+    });
+  }
+
+  static double calculateTotalFileSize(List<File> files) {
+    return files.fold(0, (sum, curFile) {
+      return curFile.existsSync() ? sum + curFile.lengthSync() : sum;
+    });
+  }
+
+  static double calculateTotalAssetsSize(List<AssetFile?> files) {
+    return files.fold(0, (sum, curFile) {
+      return sum + (curFile?.newSize ?? 0);
+    });
   }
 
   static List<String> extractAssetsFromPubspec(

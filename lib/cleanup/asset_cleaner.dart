@@ -2,6 +2,7 @@
 // Code modified and adapted
 
 import 'dart:io';
+import 'package:asset_doctor/utils/file_helper.dart';
 import 'package:path/path.dart' as p;
 import 'dart:collection'; // Import for SplayTreeMap
 
@@ -70,69 +71,8 @@ class AssetCleaner {
     return count;
   }
 
-  Set<String> findAllStringLiteralsInCode(Directory dir, String projectRoot) {
-    final allNormalizedLiterals = <String>{};
-    final stringLiteralRegex = RegExp(
-        '\'(?:[^\\\'\\\\]|\\\\.)*\\\'|\\"(?:[^\\"\\\\]|\\\\.)*\\"|r\'[^\\\']*\\\'|r"[^\\"]*\\""',
-        multiLine: true);
-    void checkFile(File file) {
-      try {
-        final content = file.readAsStringSync();
-        final matches = stringLiteralRegex.allMatches(content);
-        for (var match in matches) {
-          String literal = match.group(0)!;
-          String? normalized = normalizeStringLiteral(literal);
-          if (normalized != null && normalized.isNotEmpty) {
-            allNormalizedLiterals.add(normalized);
-          }
-        }
-      } catch (e) {
-        print('⚠️ Error reading file ${file.path}: $e');
-      }
-    }
-
-    if (dir.existsSync()) {
-      try {
-        for (var entity in dir.listSync(recursive: true)) {
-          if (entity is File &&
-              entity.path.endsWith('.dart') &&
-              !shouldIgnore(entity)) {
-            checkFile(entity);
-          }
-        }
-      } catch (e) {
-        print('⚠️ Error traversing directory ${dir.path}: $e');
-      }
-    } else {
-      print('⚠️ Lib directory not found at ${dir.path}');
-    }
-    return allNormalizedLiterals;
-  }
-
-  String? normalizeStringLiteral(String literal) {
-    if (literal.isEmpty) return null;
-    String? content;
-    if (literal.startsWith('r')) {
-      if (literal.length >= 3) {
-        content = literal.substring(2, literal.length - 1);
-      }
-    } else if ((literal.startsWith("'") && literal.endsWith("'")) ||
-        (literal.startsWith('"') && literal.endsWith('"'))) {
-      if (literal.length >= 2) {
-        content = literal.substring(1, literal.length - 1);
-      }
-    }
-    return content?.trim();
-  }
-
-  bool shouldIgnore(File file) {
-    final filePath = file.path.replaceAll('\\', '/');
-    final rootPath = projectRoot.replaceAll('\\', '/');
-    return ignoredDirs.any((dir) {
-      final ignoredPath = p.join(rootPath, dir).replaceAll('\\', '/');
-      return filePath.contains(ignoredPath);
-    });
-  }
+  Set<String> findAllStringLiteralsInCode(Directory dir, String projectRoot) =>
+      FileHelper.findAllStringLiteralsInCode(dir, projectRoot, ignoredDirs);
 
   void displayResults(Set<String> allAssets, List<String> usedAssets,
       Map<String, dynamic> unusedTree, Map<String, dynamic> excludedTree) {
