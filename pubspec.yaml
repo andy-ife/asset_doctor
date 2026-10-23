@@ -8,11 +8,14 @@ environment:
 
 dependencies:
   args: ^2.7.0
-  ffmpeg_native_lib:
-    git:
-      url: https://github.com/andy-ife/ffmpeg_native_lib
-      ref: "098b39d"
+  
+  # Video
+  compressor: ^1.0.0
+
+  # Image
   image_compression: ^1.0.5
+
+
   path: ^1.9.1
 
 dev_dependencies:
