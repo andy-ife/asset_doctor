@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:path/path.dart' as p;
 
-enum MediaType { image, video, audio, text, unkown }
+enum AssetType { image, video, audio, text, unkown }
 
 const imageExtensions = [
   '.png',
@@ -33,19 +33,19 @@ const textExtensions = [
   '',
 ];
 
-extension MediaTypeExtension on File {
+extension AssetTypeExtension on File {
   bool get isImage => imageExtensions.contains(p.extension(absolute.path, 2));
   bool get isVideo => videoExtensions.contains(p.extension(absolute.path, 2));
   bool get isAudio => audioExtensions.contains(p.extension(absolute.path, 2));
   bool get isText => textExtensions.contains(p.extension(absolute.path, 2));
 
-  MediaType get mediaType => isImage
-      ? MediaType.image
+  AssetType get assetType => isImage
+      ? AssetType.image
       : isVideo
-          ? MediaType.video
+          ? AssetType.video
           : isAudio
-              ? MediaType.audio
+              ? AssetType.audio
               : isText
-                  ? MediaType.text
-                  : MediaType.unkown;
+                  ? AssetType.text
+                  : AssetType.unkown;
 }
