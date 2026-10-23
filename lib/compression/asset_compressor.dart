@@ -5,4 +5,6 @@ class AssetCompressor {
       : compressor = compressor ?? Compressor();
 
   final Compressor compressor;
+
+  
 }

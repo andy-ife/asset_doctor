@@ -3,7 +3,17 @@ import 'dart:io';
 import 'package:path/path.dart' as p;
 
 class FileHelper {
-  static Set<String> findAllFilesInAssets(String projectRoot, Directory dir) {
+  static const Set<String> commonAssetLocations = {
+    'assets',
+    'android/app/src/main/res',
+    'ios/Runner/Assets.xcassets',
+    'macos/Runner/Assets.xcassets',
+    'windows/runner/resources',
+    'linux/runner/resources'
+  };
+
+  static Set<String> findAllFilesInDirectory(
+      String projectRoot, Directory dir) {
     final files = <String>{};
     if (!dir.existsSync()) return files;
     try {
@@ -18,6 +28,20 @@ class FileHelper {
       }
     } catch (e) {
       print('⚠️ Error listing files in ${dir.path}: $e');
+    }
+    return files;
+  }
+
+  static Set<String> findAllFilesInCommonAssetLocations(String projectRoot) {
+    final files = <String>{};
+    for (var dir in commonAssetLocations) {
+      final safeDir = Directory(p.join(projectRoot, dir));
+      try {
+        if (!safeDir.existsSync()) break;
+        files.addAll(findAllFilesInDirectory(projectRoot, safeDir));
+      } catch (e) {
+        print('⚠️ Error listing files in ${safeDir.path}: $e');
+      }
     }
     return files;
   }

@@ -1,4 +1,4 @@
-import 'package:asset_doctor/utils/asset.dart';
+import 'package:asset_doctor/utils/file_extension.dart';
 
 class AssetFile {
   const AssetFile(

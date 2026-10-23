@@ -62,7 +62,7 @@ class AssetDoctor {
     }
 
     final allAssetFiles =
-        FileHelper.findAllFilesInAssets(projectRoot, assetsDir);
+        FileHelper.findAllFilesInDirectory(projectRoot, assetsDir);
     if (allAssetFiles.isEmpty) {
       print('No files found in the assets directory (excluding hidden files).');
       return;
