@@ -24,6 +24,8 @@ class AssetCompressor {
   late final Directory assetsDir;
   late final List<String> ignoredDirs; // Folders to ignore during code search
 
+  List<Isolate> curIsolates = [];
+
   Map<String, dynamic> buildTree(List<String> paths) {
     return {};
   }
@@ -34,7 +36,7 @@ class AssetCompressor {
     return 0;
   }
 
-  void compressAllAssets() {
+  Future compressAllAssets() async {
     final assets = FileHelper.findAllFilesInCommonAssetLocations(projectRoot);
     final initialSize =
         FileHelper.calculateTotalFileSize(assets.map((e) => File(e)).toList());
@@ -43,15 +45,15 @@ class AssetCompressor {
       final file = File(asset);
       if (!file.existsSync()) continue;
       print('Compressing ${file.path}...');
-      Isolate.spawn((_) async {
+      curIsolates.add(await Isolate.spawn((_) async {
         try {
           compressedAssets.add(await compressor.compressMedia(file));
         } catch (e) {
           rethrow;
         }
-      }, null);
+      }, null));
     }
-    print("Successfully compressed all assets");
+    print("Successfully compressed all assets\n");
     print("Initial size: $initialSize");
     print(
         "Final size: ${FileHelper.calculateTotalAssetsSize(compressedAssets)}");

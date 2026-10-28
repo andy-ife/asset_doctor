@@ -18,11 +18,14 @@ const imageExtensions = [
 const videoExtensions = [
   '.mp4',
   '.mkv',
+  '.avi',
 ];
 
 const audioExtensions = [
   '.m4a',
   '.mp3',
+  '.ogg',
+  '.opus',
 ];
 
 const textExtensions = [

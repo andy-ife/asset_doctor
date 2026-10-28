@@ -1,6 +1,4 @@
 import 'dart:io';
-import 'dart:isolate';
-
 import 'package:asset_doctor/model/asset_file.dart';
 import 'package:asset_doctor/utils/file_extension.dart';
 import 'package:compressor/compressor.dart' as cp;
