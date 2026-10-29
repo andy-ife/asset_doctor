@@ -8,17 +8,14 @@ environment:
 
 dependencies:
   args: ^2.7.0
-  
+  path: ^1.9.1
+
   # Video
   compressor: ^1.0.0
 
   # Image
   image_compression: ^1.0.5
 
-
-  path: ^1.9.1
-
 dev_dependencies:
   lints: ^6.0.0
-  logging: ^1.3.0
   test: ^1.25.6

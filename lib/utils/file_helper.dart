@@ -1,16 +1,19 @@
 import 'dart:io';
 
 import 'package:asset_doctor/model/asset_file.dart';
+import 'package:asset_doctor/utils/ui.dart';
 import 'package:path/path.dart' as p;
 
+enum Platform { assets, android, ios, macos, windows, linux }
+
 class FileHelper {
-  static const Set<String> commonAssetLocations = {
-    'assets',
-    'android/app/src/main/res',
-    'ios/Runner/Assets.xcassets',
-    'macos/Runner/Assets.xcassets',
-    'windows/runner/resources',
-    'linux/runner/resources'
+  static const Map<Platform, String> commonAssetLocations = {
+    Platform.assets: 'assets',
+    Platform.android: 'android/app/src/main/res',
+    Platform.ios: 'ios/Runner/Assets.xcassets',
+    Platform.macos: 'macos/Runner/Assets.xcassets',
+    Platform.windows: 'windows/runner/resources',
+    Platform.linux: 'linux/runner/resources'
   };
 
   static Set<String> findAllFilesInDirectory(
@@ -28,20 +31,20 @@ class FileHelper {
         }
       }
     } catch (e) {
-      print('⚠️ Error listing files in ${dir.path}: $e');
+      printError('Error listing files in ${dir.path}: $e');
     }
     return files;
   }
 
   static Set<String> findAllFilesInCommonAssetLocations(String projectRoot) {
     final files = <String>{};
-    for (var dir in commonAssetLocations) {
+    for (var dir in commonAssetLocations.values) {
       final safeDir = Directory(p.join(projectRoot, dir));
       try {
         if (!safeDir.existsSync()) continue;
         files.addAll(findAllFilesInDirectory(projectRoot, safeDir));
       } catch (e) {
-        print('⚠️ Error listing files in ${safeDir.path}: $e');
+        printError('Error listing files in ${safeDir.path}: $e');
       }
     }
     return files;
@@ -65,7 +68,7 @@ class FileHelper {
           }
         }
       } catch (e) {
-        print('⚠️ Error reading file ${file.path}: $e');
+        printError('Error reading file ${file.path}: $e');
       }
     }
 
@@ -79,10 +82,10 @@ class FileHelper {
           }
         }
       } catch (e) {
-        print('⚠️ Error traversing directory ${dir.path}: $e');
+        printError('Error traversing directory ${dir.path}: $e');
       }
     } else {
-      print('⚠️ Lib directory not found at ${dir.path}');
+      printError('Lib directory not found at ${dir.path}');
     }
     return allNormalizedLiterals;
   }
@@ -179,7 +182,7 @@ class FileHelper {
         }
       }
     } catch (e) {
-      print('⚠️ Error listing files in ${dir.path}: $e');
+      printError('Error listing files in ${dir.path}: $e');
     }
     return files;
   }

@@ -41,6 +41,7 @@ class AssetCompressor {
     final initialSize =
         FileHelper.calculateTotalFileSize(assets.map((e) => File(e)).toList());
     final compressedAssets = <AssetFile?>[];
+
     for (var asset in assets) {
       final file = File(asset);
       if (!file.existsSync()) continue;
