@@ -4,7 +4,7 @@ import 'package:asset_doctor/model/asset_file.dart';
 import 'package:asset_doctor/utils/ui.dart';
 import 'package:path/path.dart' as p;
 
-enum Platform { assets, android, ios, macos, windows, linux }
+enum Platform { assets, assetsVariant, android, ios, macos, windows, linux }
 
 class FileHelper {
   static const Map<Platform, String> commonAssetLocations = {
@@ -14,6 +14,15 @@ class FileHelper {
     Platform.macos: 'macos/Runner/Assets.xcassets',
     Platform.windows: 'windows/runner/resources',
     Platform.linux: 'linux/runner/resources'
+  };
+
+  static const Map<Platform, String> commonFontLocations = {
+    Platform.assets: 'fonts',
+    Platform.assetsVariant: 'font',
+    Platform.ios: 'ios/Runner/Fonts',
+    Platform.macos: 'macos/Runner/Fonts',
+    Platform.windows: 'windows/runner/fonts',
+    Platform.linux: 'linux/runner/fonts'
   };
 
   static Set<String> findAllFilesInDirectory(
