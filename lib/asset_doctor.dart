@@ -111,40 +111,31 @@ class AssetDoctor {
         'Found ${allNormalizedLiterals.length} string literals in the code.');
 
     if (fullRun) {
-      clean(allAssetFiles, allNormalizedLiterals, projectRoot, assetCleaner,
+      final cleanedFiles = clean(allAssetFiles, allNormalizedLiterals,
+          projectRoot, assetCleaner, pubspecPath, cleanOnly);
+      final usedFiles =
+          allAssetFiles.where((e) => !cleanedFiles.contains(e)).toSet();
+      compress(usedFiles, allNormalizedLiterals, projectRoot, assetComppressor,
           pubspecPath);
-      compress();
     } else if (cleanOnly) {
       clean(allAssetFiles, allNormalizedLiterals, projectRoot, assetCleaner,
-          pubspecPath);
+          pubspecPath, cleanOnly);
     } else if (compressOnly) {
-      compress();
+      compress(allAssetFiles, allNormalizedLiterals, projectRoot,
+          assetComppressor, pubspecPath);
     }
   }
 }
 
-void clean(Set<String> allAssetFiles, Set<String> allNormalizedLiterals,
-    String projectRoot, AssetCleaner assetCleaner, String pubspecPath) {
-  final usedAssetPaths = <String>{};
-  for (final assetPath in allAssetFiles) {
-    final filename = p.basename(assetPath);
-    final basenameWithoutExtension = p.basenameWithoutExtension(assetPath);
-
-    final potentialReferences = [
-      assetPath,
-      filename,
-      basenameWithoutExtension,
-    ];
-
-    final isUsed = allNormalizedLiterals.any((literal) {
-      return potentialReferences.any((ref) => literal.contains(ref));
-    });
-
-    if (isUsed) {
-      usedAssetPaths.add(assetPath);
-    }
-  }
-
+List<String> clean(
+    Set<String> allAssetFiles,
+    Set<String> allNormalizedLiterals,
+    String projectRoot,
+    AssetCleaner assetCleaner,
+    String pubspecPath,
+    bool cleanOnly) {
+  final usedAssetPaths =
+      getUsedAssetPaths(allAssetFiles, allNormalizedLiterals);
   final potentialUnusedPaths = allAssetFiles.difference(usedAssetPaths).toList()
     ..sort();
   List<String> unusedAssetsForDeletion = <String>[]; // Use List for indexing
@@ -198,6 +189,90 @@ void clean(Set<String> allAssetFiles, Set<String> allNormalizedLiterals,
     printError('Deletion cancelled by user.');
   }
 
+  if (cleanOnly) {
+    checkPubspecForSkippedAssets(pubspecPath, projectRoot, usedAssetPaths);
+  }
+
+  return unusedAssetsForDeletion;
+}
+
+void compress(Set<String> allAssetFiles, Set<String> allNormalizedLiterals,
+    String projectRoot, AssetCompressor assetCompressor, String pubspecPath) {
+  for (final assetPath in allAssetFiles) {
+    final file = File(p.join(projectRoot, assetPath));
+    bool isNonEmpty = false;
+    final assetsForCompression = <String>[];
+    try {
+      if (file.existsSync()) {
+        isNonEmpty = file.lengthSync() > 0;
+      }
+    } catch (e) {
+      printWarning('Could not check size of "$assetPath": $e');
+    }
+
+    assetsForCompression.add(assetPath);
+
+    final tree = assetCompressor.buildTree(assetsForCompression);
+
+    assetCompressor.displayResults(allAssetFiles, assetsForCompression, tree);
+
+    if (assetsForCompression.isNotEmpty) {
+      printInfo('Marking all media assets for compression');
+    }
+
+    String? finalConfirm;
+    printInfo(
+        '\nFINAL CONFIRMATION: You are about to compress ${assetsForCompression.length} asset(s).');
+    stdout.write('Proceed with compression? It may take a while (Y/N): ');
+    finalConfirm = stdin.readLineSync();
+    if ((finalConfirm != null && finalConfirm.toLowerCase() == 'y')) {
+      printLoading(
+          message: '\nCompressing ${assetsForCompression.length} assets',
+          work: Future(() async {
+            await assetCompressor.compressAllAssets();
+          }).asStream());
+    } else {
+      printError('Deletion cancelled by user.');
+    }
+  }
+  final usedAssetPaths =
+      getUsedAssetPaths(allAssetFiles, allNormalizedLiterals);
+  checkPubspecForSkippedAssets(pubspecPath, projectRoot, usedAssetPaths);
+}
+
+void getFiles(String projectRoot, Directory dir, Set<String> result) {
+  if (dir.existsSync()) {
+    final allAssetFiles = FileHelper.findAllFilesInDirectory(projectRoot, dir);
+    if (allAssetFiles.isEmpty) {
+      printWarning(
+          'No files found in the assets directory (excluding hidden files).');
+    }
+    result.addAll(allAssetFiles);
+    printInfo('\nFound ${allAssetFiles.length} files in the assets directory.');
+  } else {
+    printWarning('Assets directory not found at ${dir.path}');
+  }
+}
+
+void showHelp() {
+  printInfo('\n`dart run asset_doctor`\n');
+  printInfo('Flags (optional):');
+  printInfo('Full run (clean & compress): --full-run, -f');
+  printInfo('Clean only: --clean-only, -c');
+  printInfo('Compress only: --compress-only, -x');
+  printInfo('Help, --help, -h');
+}
+
+void showTutorial() {
+  printInfo('Choose an option:');
+  printInfo('1. Full run (clean & compress)');
+  printInfo('2. Clean only');
+  printInfo('3. Compress only');
+  printInfo('4. Help');
+}
+
+void checkPubspecForSkippedAssets(
+    String pubspecPath, String projectRoot, Set<String> usedAssetPaths) {
   printInfo('Checking pubspec.yaml for any skipped assets...');
 
   final declaredAssetsInPubspec =
@@ -236,35 +311,26 @@ void clean(Set<String> allAssetFiles, Set<String> allNormalizedLiterals,
   }
 }
 
-void compress() {}
+Set<String> getUsedAssetPaths(
+    Set<String> allAssetFiles, Set<String> allNormalizedLiterals) {
+  Set<String> usedAssetPaths = {};
+  for (final assetPath in allAssetFiles) {
+    final filename = p.basename(assetPath);
+    final basenameWithoutExtension = p.basenameWithoutExtension(assetPath);
 
-void getFiles(String projectRoot, Directory dir, Set<String> result) {
-  if (dir.existsSync()) {
-    final allAssetFiles = FileHelper.findAllFilesInDirectory(projectRoot, dir);
-    if (allAssetFiles.isEmpty) {
-      printWarning(
-          'No files found in the assets directory (excluding hidden files).');
+    final potentialReferences = [
+      assetPath,
+      filename,
+      basenameWithoutExtension,
+    ];
+
+    final isUsed = allNormalizedLiterals.any((literal) {
+      return potentialReferences.any((ref) => literal.contains(ref));
+    });
+
+    if (isUsed) {
+      usedAssetPaths.add(assetPath);
     }
-    result.addAll(allAssetFiles);
-    printInfo('\nFound ${allAssetFiles.length} files in the assets directory.');
-  } else {
-    printWarning('Assets directory not found at ${dir.path}');
   }
-}
-
-void showHelp() {
-  printInfo('\n`dart run asset_doctor`\n');
-  printInfo('Flags (optional):');
-  printInfo('Full run (clean & compress): --full-run, -f');
-  printInfo('Clean only: --clean-only, -c');
-  printInfo('Compress only: --compress-only, -x');
-  printInfo('Help, --help, -h');
-}
-
-void showTutorial() {
-  printInfo('Choose an option:');
-  printInfo('1. Full run (clean & compress)');
-  printInfo('2. Clean only');
-  printInfo('3. Compress only');
-  printInfo('4. Help');
+  return usedAssetPaths;
 }

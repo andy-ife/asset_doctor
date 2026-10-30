@@ -4,6 +4,7 @@ import 'dart:isolate';
 import 'package:asset_doctor/compression/compressor.dart';
 import 'package:asset_doctor/model/asset_file.dart';
 import 'package:asset_doctor/utils/file_helper.dart';
+import 'package:asset_doctor/utils/ui.dart';
 import 'package:path/path.dart' as p;
 
 class AssetCompressor {
@@ -36,6 +37,9 @@ class AssetCompressor {
     return 0;
   }
 
+  void displayResults(Set<String> allAssetFiles,
+      List<String> filesForCompression, Map<String, dynamic> tree) {}
+
   Future compressAllAssets() async {
     final assets = FileHelper.findAllFilesInCommonAssetLocations(projectRoot);
     final initialSize =
@@ -54,9 +58,9 @@ class AssetCompressor {
         }
       }, null));
     }
-    print("Successfully compressed all assets\n");
-    print("Initial size: $initialSize");
-    print(
+    printSuccess("Successfully compressed all assets\n");
+    printSuccess("Initial size: $initialSize");
+    printSuccess(
         "Final size: ${FileHelper.calculateTotalAssetsSize(compressedAssets)}");
   }
 }
