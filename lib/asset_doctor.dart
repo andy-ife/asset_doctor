@@ -60,10 +60,10 @@ class AssetDoctor {
     bool fullRun = argResults['full-run'] as bool;
     final noArgs = !cleanOnly && !compressOnly && !fullRun && !requestingHelp;
 
-    printInfo('--Asset Doctor--');
+    Ui.printInfo('--Asset Doctor--');
 
     if (noArgs) {
-      printInfo('Get started');
+      Ui.printInfo('Get started');
       showTutorial();
       do {
         final input = stdin.readLineSync();
@@ -81,13 +81,13 @@ class AssetDoctor {
             showHelp();
             break;
           default:
-            printError('Invalid option. Please choose 1 - 4');
+            Ui.printError('Invalid option. Please choose 1 - 4');
         }
       } while (!fullRun && !cleanOnly && !compressOnly);
     }
 
     if (requestingHelp) {
-      printInfo(
+      Ui.printInfo(
           'Clean unused Dart/Flutter assets and compress the ones you use. Choose full-run or one option only');
       showHelp();
       return;
@@ -96,7 +96,7 @@ class AssetDoctor {
     // Work starts
     Set<String> allAssetFiles = {};
 
-    printInfo('Checking asset usage in Dart/Flutter project...');
+    Ui.printInfo('Checking asset usage in Dart/Flutter project...');
 
     getFiles(projectRoot, assetsDir, allAssetFiles);
     getFiles(projectRoot, androidAssetsDir, allAssetFiles);
@@ -107,7 +107,7 @@ class AssetDoctor {
 
     final allNormalizedLiterals =
         assetCleaner.findAllStringLiteralsInCode(libDir, projectRoot);
-    printInfo(
+    Ui.printInfo(
         'Found ${allNormalizedLiterals.length} string literals in the code.');
 
     if (fullRun) {
@@ -150,7 +150,7 @@ List<String> clean(
         isNonEmpty = file.lengthSync() > 0;
       }
     } catch (e) {
-      printWarning('Could not check size of "$assetPath": $e');
+      Ui.printWarning('Could not check size of "$assetPath": $e');
       isJson = false;
     }
 
@@ -168,25 +168,25 @@ List<String> clean(
       allAssetFiles, usedAssetPaths.toList(), unusedTree, excludedTree);
 
   if (unusedAssetsForDeletion.isNotEmpty) {
-    printInfo('Marking all unused assets for deletion...');
+    Ui.printInfo('Marking all unused assets for deletion...');
   }
 
   String? finalConfirm;
-  printInfo(
+  Ui.printInfo(
       '\nFINAL CONFIRMATION: You are about to delete ${unusedAssetsForDeletion.length} asset(s).');
   stdout.write('Proceed with deletion? (Y/N): ');
   finalConfirm = stdin.readLineSync();
   if ((finalConfirm != null && finalConfirm.toLowerCase() == 'y')) {
-    printLoading(
+    Ui.printLoading(
         message: '\nDeleting ${unusedAssetsForDeletion.length} assets',
         work: Future(() async {
           final freedSpace =
               await assetCleaner.deleteUnusedAssets(unusedAssetsForDeletion);
-          printSuccess(
+          Ui.printSuccess(
               '🎉 You have freed up ${freedSpace.toStringAsFixed(2)} MB of space.');
         }).asStream());
   } else {
-    printError('Deletion cancelled by user.');
+    Ui.printError('Deletion cancelled by user.');
   }
 
   if (cleanOnly) {
@@ -207,7 +207,7 @@ void compress(Set<String> allAssetFiles, Set<String> allNormalizedLiterals,
         isNonEmpty = file.lengthSync() > 0;
       }
     } catch (e) {
-      printWarning('Could not check size of "$assetPath": $e');
+      Ui.printWarning('Could not check size of "$assetPath": $e');
     }
 
     assetsForCompression.add(assetPath);
@@ -217,22 +217,22 @@ void compress(Set<String> allAssetFiles, Set<String> allNormalizedLiterals,
     assetCompressor.displayResults(allAssetFiles, assetsForCompression, tree);
 
     if (assetsForCompression.isNotEmpty) {
-      printInfo('Marking all media assets for compression');
+      Ui.printInfo('Marking all media assets for compression');
     }
 
     String? finalConfirm;
-    printInfo(
+    Ui.printInfo(
         '\nFINAL CONFIRMATION: You are about to compress ${assetsForCompression.length} asset(s).');
     stdout.write('Proceed with compression? It may take a while (Y/N): ');
     finalConfirm = stdin.readLineSync();
     if ((finalConfirm != null && finalConfirm.toLowerCase() == 'y')) {
-      printLoading(
+      Ui.printLoading(
           message: '\nCompressing ${assetsForCompression.length} assets',
           work: Future(() async {
             await assetCompressor.compressAllAssets();
           }).asStream());
     } else {
-      printError('Deletion cancelled by user.');
+      Ui.printError('Deletion cancelled by user.');
     }
   }
   final usedAssetPaths =
@@ -244,36 +244,37 @@ void getFiles(String projectRoot, Directory dir, Set<String> result) {
   if (dir.existsSync()) {
     final allAssetFiles = FileHelper.findAllFilesInDirectory(projectRoot, dir);
     if (allAssetFiles.isEmpty) {
-      printWarning(
+      Ui.printWarning(
           'No files found in the assets directory (excluding hidden files).');
     }
     result.addAll(allAssetFiles);
-    printInfo('\nFound ${allAssetFiles.length} files in the assets directory.');
+    Ui.printInfo(
+        '\nFound ${allAssetFiles.length} files in the assets directory.');
   } else {
-    printWarning('Assets directory not found at ${dir.path}');
+    Ui.printWarning('Assets directory not found at ${dir.path}');
   }
 }
 
 void showHelp() {
-  printInfo('\n`dart run asset_doctor`\n');
-  printInfo('Flags (optional):');
-  printInfo('Full run (clean & compress): --full-run, -f');
-  printInfo('Clean only: --clean-only, -c');
-  printInfo('Compress only: --compress-only, -x');
-  printInfo('Help, --help, -h');
+  Ui.printInfo('\n`dart run asset_doctor`\n');
+  Ui.printInfo('Flags (optional):');
+  Ui.printInfo('Full run (clean & compress): --full-run, -f');
+  Ui.printInfo('Clean only: --clean-only, -c');
+  Ui.printInfo('Compress only: --compress-only, -x');
+  Ui.printInfo('Help, --help, -h');
 }
 
 void showTutorial() {
-  printInfo('Choose an option:');
-  printInfo('1. Full run (clean & compress)');
-  printInfo('2. Clean only');
-  printInfo('3. Compress only');
-  printInfo('4. Help');
+  Ui.printInfo('Choose an option:');
+  Ui.printInfo('1. Full run (clean & compress)');
+  Ui.printInfo('2. Clean only');
+  Ui.printInfo('3. Compress only');
+  Ui.printInfo('4. Help');
 }
 
 void checkPubspecForSkippedAssets(
     String pubspecPath, String projectRoot, Set<String> usedAssetPaths) {
-  printInfo('Checking pubspec.yaml for any skipped assets...');
+  Ui.printInfo('Checking pubspec.yaml for any skipped assets...');
 
   final declaredAssetsInPubspec =
       FileHelper.extractAssetsFromPubspec(pubspecPath, projectRoot);
@@ -282,32 +283,33 @@ void checkPubspecForSkippedAssets(
         .where((assetPath) => !usedAssetPaths.contains(assetPath))
         .toList()
       ..sort();
-    printInfo('\n--- Pubspec.yaml Info ---');
-    printInfo(
+    Ui.printInfo('\n--- Pubspec.yaml Info ---');
+    Ui.printInfo(
         'Found ${declaredAssetsInPubspec.length} assets declared in pubspec.yaml');
     if (unusedDeclaredAssets.isNotEmpty) {
-      printInfo(
+      Ui.printInfo(
           '${unusedDeclaredAssets.length} declared assets were found in assets/ but not referenced in code');
       for (var asset in unusedDeclaredAssets) {
-        printInfo('- $asset');
+        Ui.printInfo('- $asset');
       }
     } else {
-      printInfo('All declared assets in pubspec.yaml appear to be referenced.');
+      Ui.printInfo(
+          'All declared assets in pubspec.yaml appear to be referenced.');
     }
     final undeclaredUsedAssets = usedAssetPaths
         .where((assetPath) => !declaredAssetsInPubspec.contains(assetPath))
         .toList()
       ..sort();
     if (undeclaredUsedAssets.isNotEmpty) {
-      printInfo(
+      Ui.printInfo(
           '${undeclaredUsedAssets.length} files in assets/ were used but *not* declared in pubspec.yaml:');
       for (var asset in undeclaredUsedAssets) {
-        printInfo('- $asset');
+        Ui.printInfo('- $asset');
       }
-      printInfo(
+      Ui.printInfo(
           '💡 Tip: Consider declaring used assets in pubspec.yaml under the `assets:` section.');
     }
-    printInfo('-------------------------');
+    Ui.printInfo('-------------------------');
   }
 }
 

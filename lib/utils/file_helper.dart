@@ -40,7 +40,7 @@ class FileHelper {
         }
       }
     } catch (e) {
-      printError('Error listing files in ${dir.path}: $e');
+      Ui.printError('Error listing files in ${dir.path}: $e');
     }
     return files;
   }
@@ -53,7 +53,7 @@ class FileHelper {
         if (!safeDir.existsSync()) continue;
         files.addAll(findAllFilesInDirectory(projectRoot, safeDir));
       } catch (e) {
-        printError('Error listing files in ${safeDir.path}: $e');
+        Ui.printError('Error listing files in ${safeDir.path}: $e');
       }
     }
     return files;
@@ -77,7 +77,7 @@ class FileHelper {
           }
         }
       } catch (e) {
-        printError('Error reading file ${file.path}: $e');
+        Ui.printError('Error reading file ${file.path}: $e');
       }
     }
 
@@ -91,10 +91,10 @@ class FileHelper {
           }
         }
       } catch (e) {
-        printError('Error traversing directory ${dir.path}: $e');
+        Ui.printError('Error traversing directory ${dir.path}: $e');
       }
     } else {
-      printError('Lib directory not found at ${dir.path}');
+      Ui.printError('Lib directory not found at ${dir.path}');
     }
     return allNormalizedLiterals;
   }
@@ -191,7 +191,7 @@ class FileHelper {
         }
       }
     } catch (e) {
-      printError('Error listing files in ${dir.path}: $e');
+      Ui.printError('Error listing files in ${dir.path}: $e');
     }
     return files;
   }

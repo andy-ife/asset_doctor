@@ -58,9 +58,9 @@ class AssetCompressor {
         }
       }, null));
     }
-    printSuccess("Successfully compressed all assets\n");
-    printSuccess("Initial size: $initialSize");
-    printSuccess(
+    Ui.printSuccess("Successfully compressed all assets\n");
+    Ui.printSuccess("Initial size: $initialSize");
+    Ui.printSuccess(
         "Final size: ${FileHelper.calculateTotalAssetsSize(compressedAssets)}");
   }
 }
