@@ -17,7 +17,7 @@ class AssetCleaner {
   late final String projectRoot;
   late final List<String> ignoredDirs; // Folders to ignore during code search
 
-  void displayResults(Set<String> allAssets, List<String> usedAssets,
+  void showAnalysis(Set<String> allAssets, List<String> usedAssets,
       Map<String, dynamic> unusedTree, Map<String, dynamic> excludedTree) {
     Ui.printInfo('\n--Asset Usage Analysis--');
     Ui.printInfo(

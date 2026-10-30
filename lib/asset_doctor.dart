@@ -192,7 +192,7 @@ class AssetDoctor {
     final unusedTree = Ui.buildTree(unusedAssetsForDeletion);
     final excludedTree = Ui.buildTree(localizationAssetsExcluded);
 
-    assetCleaner.displayResults(
+    assetCleaner.showAnalysis(
         allAssetFiles, usedAssetPaths.toList(), unusedTree, excludedTree);
 
     if (unusedAssetsForDeletion.isNotEmpty) {
@@ -235,10 +235,11 @@ class AssetDoctor {
       files = filesLeft ?? allAssetFiles;
     }
 
+    final assetsForCompression = <String>[];
+
     for (final assetPath in files) {
       final file = File(p.join(projectRoot, assetPath));
       bool isNonEmpty = false;
-      final assetsForCompression = <String>[];
       try {
         if (file.existsSync()) {
           isNonEmpty = file.lengthSync() > 0;
@@ -250,33 +251,33 @@ class AssetDoctor {
       if (isNonEmpty) {
         assetsForCompression.add(assetPath);
       }
+    }
 
-      final tree = Ui.buildTree(assetsForCompression);
+    final tree = Ui.buildTree(assetsForCompression);
 
-      assetCompressor.displayResults(allAssetFiles, assetsForCompression, tree);
+    assetCompressor.showAnalysis(files, assetsForCompression, tree);
 
-      if (assetsForCompression.isNotEmpty) {
-        Ui.printInfo('Marking all media assets for compression');
-      }
+    if (assetsForCompression.isNotEmpty) {
+      Ui.printInfo('Marking all media assets for compression');
+    }
 
-      String? finalConfirm;
-      Ui.printInfo(
-          '\nFINAL CONFIRMATION: You are about to compress ${assetsForCompression.length} asset(s).');
-      stdout.write('Proceed with compression? It may take a while (Y/N): ');
-      finalConfirm = stdin.readLineSync();
-      if ((finalConfirm != null && finalConfirm.toLowerCase() == 'y')) {
-        Ui.printLoading(
-            message: '\nCompressing ${assetsForCompression.length} assets',
-            work: Future(() async {
-              final freedSpace =
-                  await assetCompressor.compressAssets(assetsForCompression);
-              spaceCompressed += freedSpace;
-              Ui.printSuccess(
-                  '🎉 You have freed up ${freedSpace.toStringAsFixed(2)} MB of space.');
-            }).asStream());
-      } else {
-        Ui.printError('Deletion cancelled by user.');
-      }
+    String? finalConfirm;
+    Ui.printInfo(
+        '\nFINAL CONFIRMATION: You are about to compress ${assetsForCompression.length} asset(s).');
+    stdout.write('Proceed with compression? It may take a while (Y/N): ');
+    finalConfirm = stdin.readLineSync();
+    if ((finalConfirm != null && finalConfirm.toLowerCase() == 'y')) {
+      Ui.printLoading(
+          message: '\nCompressing ${assetsForCompression.length} assets',
+          work: Future(() async {
+            final freedSpace =
+                await assetCompressor.compressAssets(assetsForCompression);
+            spaceCompressed += freedSpace;
+            Ui.printSuccess(
+                '🎉 You have freed up ${freedSpace.toStringAsFixed(2)} MB of space.');
+          }).asStream());
+    } else {
+      Ui.printError('Deletion cancelled by user.');
     }
 
     checkPubspecForSkippedAssets(pubspecPath, projectRoot, files);

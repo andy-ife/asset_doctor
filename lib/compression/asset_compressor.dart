@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:isolate';
 
 import 'package:asset_doctor/compression/compressor.dart';
+import 'package:asset_doctor/utils/ui.dart';
 
 class AssetCompressor {
   AssetCompressor({
@@ -20,8 +21,32 @@ class AssetCompressor {
 
   List<Isolate> curIsolates = [];
 
-  void displayResults(Set<String> allAssetFiles,
-      List<String> filesForCompression, Map<String, dynamic> tree) {}
+  void showAnalysis(Set<String> allAssetFiles, List<String> filesForCompression,
+      Map<String, dynamic> tree) {
+    Ui.printInfo('\n--Asset Compression Analysis--');
+    Ui.printWarning('\nAssets MARKED FOR COMPRESSION:');
+    if (filesForCompression.isNotEmpty) {
+      Ui.printWarning('(${filesForCompression.length} files)');
+      Ui.printTree(tree, '', true);
+    } else {
+      Ui.printDefault('  None found.');
+    }
+
+    final selectedAssets = filesForCompression.toSet();
+    final totalAssets = allAssetFiles.length;
+    final totalForCompression = selectedAssets.length;
+    final totalNotSelected = allAssetFiles.difference(selectedAssets).length;
+
+    Ui.printInfo('\nSummary:');
+    Ui.printInfo('• Total assets (excluding hidden): $totalAssets');
+    Ui.printInfo('• Assets marked for compression: $totalForCompression');
+    Ui.printInfo('• Assets not selected for compression: $totalNotSelected');
+    if (totalAssets > 0) {
+      Ui.printInfo(
+          '• Percentage selected for compression: ${((totalForCompression / totalAssets) * 100).toStringAsFixed(2)}%');
+    }
+    Ui.printInfo('---------------------------');
+  }
 
   Future<double> compressAssets(List<String> assets) async {
     double result = 0;
