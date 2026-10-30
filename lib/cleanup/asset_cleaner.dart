@@ -3,6 +3,7 @@
 
 import 'dart:io';
 import 'package:asset_doctor/utils/file_helper.dart';
+import 'package:asset_doctor/utils/ui.dart';
 import 'package:path/path.dart' as p;
 import 'dart:collection'; // Import for SplayTreeMap
 
@@ -51,8 +52,8 @@ class AssetCleaner {
       final key = keys[i];
       final isLastEntry = (i == keys.length - 1);
       final entityPrefix = isLastEntry ? '└── ' : '├── ';
-      final childPrefix = prefix + (isLast ? '    ' : '│   ');
-      print('$prefix$entityPrefix$key');
+      final childPrefix = prefix + (isLastEntry ? '    ' : '│   ');
+      printDefault('$prefix$entityPrefix$key');
       if (node[key] is Map) {
         printTree(node[key], childPrefix, isLastEntry);
       }
@@ -76,48 +77,46 @@ class AssetCleaner {
 
   void displayResults(Set<String> allAssets, List<String> usedAssets,
       Map<String, dynamic> unusedTree, Map<String, dynamic> excludedTree) {
-    print('\n--- Asset Usage Analysis ---');
-    print(
-        '\n✅ Potentially Used assets (Found in assets/ and path/name found as substring in code strings):');
+    printInfo('\n--Asset Usage Analysis--');
+    printInfo(
+        '\nPotentially Used assets (Found in assets/ and path/name found as a string somewhere in the code):');
     if (usedAssets.isNotEmpty) {
       for (var asset in usedAssets) {
-        print('- $asset');
+        printDefault('• $asset');
       }
     } else {
-      print('  None found.');
+      printDefault('None found.');
     }
-    print(
-        '\n➡️ Excluded assets (Found in assets/ and appear unused, but are non-empty JSON files):');
+    printInfo(
+        '\nExcluded assets (Found in assets/ and appear unused, but are non-empty JSON files):');
     if (excludedTree.isNotEmpty) {
       printTree(excludedTree, '', true);
     } else {
-      print('  None found.');
+      printDefault('None found.');
     }
-    print('\n❌ Unused assets MARKED FOR DELETION:');
+    printWarning('\n❌ Unused assets MARKED FOR DELETION:');
     int totalUnusedForDeletion = countFilesInTree(unusedTree);
     if (totalUnusedForDeletion > 0) {
-      print('($totalUnusedForDeletion files listed below)');
+      printWarning('($totalUnusedForDeletion files)');
       printTree(unusedTree, '', true);
     } else {
-      print('  None found. 🎉');
+      printDefault('  None found');
     }
     final totalAssetsInDir = allAssets.length;
     final totalUsedAssets = usedAssets.length;
     int totalLocalizationExcluded = countFilesInTree(excludedTree);
     final totalUnused = totalUnusedForDeletion + totalLocalizationExcluded;
-    print('\n📊 Summary:');
-    print(
-        '- Total files found in assets/ directory (excluding hidden): $totalAssetsInDir');
-    print(
-        '- Files in assets/ potentially referenced in code: $totalUsedAssets');
-    print('- Files in assets/ appearing unused (Total): $totalUnused');
-    print('  - Excluded (e.g., non-empty JSON): $totalLocalizationExcluded');
-    print('  - Marked for deletion: $totalUnusedForDeletion');
+    printInfo('\nSummary:');
+    print('• Total assets (excluding hidden): $totalAssetsInDir');
+    print('• Potentially Used assets: $totalUsedAssets');
+    print('• Unused assets (Total): $totalUnused');
+    print('  • Excluded (e.g., non-empty JSON): $totalLocalizationExcluded');
+    print('  • Marked for deletion: $totalUnusedForDeletion');
     if (totalAssetsInDir > 0) {
       print(
-          '- Percentage used: ${((totalUsedAssets / totalAssetsInDir) * 100).toStringAsFixed(2)}%');
+          '• Percentage used: ${((totalUsedAssets / totalAssetsInDir) * 100).toStringAsFixed(2)}%');
       print(
-          '- Percentage unused (for deletion): ${((totalUnusedForDeletion / totalAssetsInDir) * 100).toStringAsFixed(2)}%');
+          '• Percentage unused (for deletion): ${((totalUnusedForDeletion / totalAssetsInDir) * 100).toStringAsFixed(2)}%');
     }
     print('---------------------------');
   }
@@ -127,16 +126,16 @@ class AssetCleaner {
     for (var assetRelativePath in unusedAssets) {
       final file = File(p.join(projectRoot, assetRelativePath));
       if (!file.existsSync()) {
-        print('⚠️ File not found, skipping deletion: "$assetRelativePath"');
+        printWarning('File not found, skipping deletion: "$assetRelativePath"');
         continue;
       }
       try {
         final fileSize = await file.length();
         totalSizeMB += fileSize / (1024 * 1024);
         await file.delete();
-        print('🗑️ Deleted: $assetRelativePath');
+        printSuccess('Deleted: $assetRelativePath');
       } catch (e) {
-        print('⚠️ Could not delete "$assetRelativePath": $e');
+        printError('Could not delete "$assetRelativePath": $e');
       }
     }
     return totalSizeMB;
