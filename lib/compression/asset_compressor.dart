@@ -2,65 +2,42 @@ import 'dart:io';
 import 'dart:isolate';
 
 import 'package:asset_doctor/compression/compressor.dart';
-import 'package:asset_doctor/model/asset_file.dart';
-import 'package:asset_doctor/utils/file_helper.dart';
-import 'package:asset_doctor/utils/ui.dart';
-import 'package:path/path.dart' as p;
 
 class AssetCompressor {
   AssetCompressor({
     Compressor? compressor,
     String? projectRoot,
-    Directory? assetsDir,
     List<String>? ignoredDirs,
   }) {
     this.compressor = compressor ?? Compressor();
     this.projectRoot = projectRoot ?? Directory.current.path;
-    this.assetsDir = assetsDir ?? Directory(p.join(this.projectRoot, 'assets'));
     this.ignoredDirs = ignoredDirs ?? ['test', 'build'];
   }
 
   late final Compressor compressor;
   late final String projectRoot;
-  late final Directory assetsDir;
   late final List<String> ignoredDirs; // Folders to ignore during code search
 
   List<Isolate> curIsolates = [];
 
-  Map<String, dynamic> buildTree(List<String> paths) {
-    return {};
-  }
-
-  void printTree(Map<String, dynamic> node, String prefic, bool isLast) {}
-
-  int countFilesInTree(Map<String, dynamic> node) {
-    return 0;
-  }
-
   void displayResults(Set<String> allAssetFiles,
       List<String> filesForCompression, Map<String, dynamic> tree) {}
 
-  Future compressAllAssets() async {
-    final assets = FileHelper.findAllFilesInCommonAssetLocations(projectRoot);
-    final initialSize =
-        FileHelper.calculateTotalFileSize(assets.map((e) => File(e)).toList());
-    final compressedAssets = <AssetFile?>[];
-
+  Future<double> compressAssets(List<String> assets) async {
+    double result = 0;
     for (var asset in assets) {
       final file = File(asset);
       if (!file.existsSync()) continue;
       print('Compressing ${file.path}...');
       curIsolates.add(await Isolate.spawn((_) async {
         try {
-          compressedAssets.add(await compressor.compressMedia(file));
+          final res = await compressor.compressMedia(file);
+          result += res ?? 0;
         } catch (e) {
           rethrow;
         }
       }, null));
     }
-    Ui.printSuccess("Successfully compressed all assets\n");
-    Ui.printSuccess("Initial size: $initialSize");
-    Ui.printSuccess(
-        "Final size: ${FileHelper.calculateTotalAssetsSize(compressedAssets)}");
+    return result;
   }
 }

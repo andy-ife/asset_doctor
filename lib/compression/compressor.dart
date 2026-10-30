@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:asset_doctor/model/asset_file.dart';
 import 'package:asset_doctor/utils/file_extension.dart';
 import 'package:compressor/compressor.dart' as cp;
 import 'package:image_compression/image_compression.dart';
@@ -7,44 +6,34 @@ import 'package:image_compression/image_compression.dart';
 class Compressor {
   const Compressor();
 
-  Future<AssetFile> compressImage(File file) async {
+  Future<double> compressImage(File file) async {
     try {
       final input =
           ImageFile(filePath: file.path, rawBytes: file.readAsBytesSync());
       final output =
           await compressInQueue(ImageFileConfiguration(input: input));
-      return AssetFile(
-          path: output.filePath,
-          oldSize: file.lengthSync().toDouble(),
-          newSize: output.sizeInBytes.toDouble(),
-          type: AssetType.image);
+      return output.sizeInBytes.toDouble();
     } catch (e) {
       rethrow;
     }
   }
 
-  Future<AssetFile> compressVideo(File file) async {
+  Future<double> compressVideo(File file) async {
     try {
-      final oldsize = file.lengthSync();
       final compressor = cp.Compressor(path: file.path, isLocal: true);
-      String result = compressor.compressVideo();
-      return AssetFile(
-          path: file.path,
-          oldSize: oldsize.toDouble(),
-          newSize: File(file.path).lengthSync().toDouble(),
-          type: AssetType.video);
+      compressor.compressVideo();
+      return File(file.path).lengthSync().toDouble();
     } catch (e) {
       rethrow;
     }
-    ;
   }
 
-  Future<AssetFile?> compressAudio(File file) async {
+  Future<double?> compressAudio(File file) async {
     print("Audio compression unsupported. Skipping ${file.path}");
     return null;
   }
 
-  Future<AssetFile?> compressMedia(File file) async {
+  Future<double?> compressMedia(File file) async {
     switch (file.assetType) {
       case AssetType.image:
         return compressImage(file);

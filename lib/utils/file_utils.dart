@@ -1,34 +1,27 @@
 import 'dart:io';
 
-import 'package:asset_doctor/model/asset_file.dart';
 import 'package:asset_doctor/utils/ui.dart';
 import 'package:path/path.dart' as p;
 
-enum Platform { assets, assetsVariant, android, ios, macos, windows, linux }
+enum Platform { assets, android, ios, macos, windows, linux }
 
-class FileHelper {
-  static const Map<Platform, String> commonAssetLocations = {
-    Platform.assets: 'assets',
-    Platform.android: 'android/app/src/main/res',
-    Platform.ios: 'ios/Runner/Assets.xcassets',
-    Platform.macos: 'macos/Runner/Assets.xcassets',
-    Platform.windows: 'windows/runner/resources',
-    Platform.linux: 'linux/runner/resources'
+class FileUtils {
+  static const Map<Platform, List<String>> commonAssetLocations = {
+    Platform.assets: ['assets', 'fonts', 'font'],
+    Platform.android: ['android/app/src/main/res'],
+    Platform.ios: ['ios/Runner/Assets.xcassets', 'ios/Runner/Fonts'],
+    Platform.macos: ['macos/Runner/Assets.xcassets', 'macos/Runner/Fonts'],
+    Platform.windows: ['windows/runner/resources', 'windows/runner/fonts'],
+    Platform.linux: ['linux/runner/resources', 'linux/runner/fonts']
   };
 
-  static const Map<Platform, String> commonFontLocations = {
-    Platform.assets: 'fonts',
-    Platform.assetsVariant: 'font',
-    Platform.ios: 'ios/Runner/Fonts',
-    Platform.macos: 'macos/Runner/Fonts',
-    Platform.windows: 'windows/runner/fonts',
-    Platform.linux: 'linux/runner/fonts'
-  };
-
-  static Set<String> findAllFilesInDirectory(
-      String projectRoot, Directory dir) {
+  /// Find all files in a directory
+  static Set<String> findAllInDirectory(String projectRoot, Directory dir) {
     final files = <String>{};
-    if (!dir.existsSync()) return files;
+    if (!dir.existsSync()) {
+      Ui.printWarning('Assets directory not found at ${dir.path}');
+      return files;
+    }
     try {
       for (var entity in dir.listSync(recursive: true)) {
         if (entity is File) {
@@ -42,23 +35,26 @@ class FileHelper {
     } catch (e) {
       Ui.printError('Error listing files in ${dir.path}: $e');
     }
-    return files;
-  }
-
-  static Set<String> findAllFilesInCommonAssetLocations(String projectRoot) {
-    final files = <String>{};
-    for (var dir in commonAssetLocations.values) {
-      final safeDir = Directory(p.join(projectRoot, dir));
-      try {
-        if (!safeDir.existsSync()) continue;
-        files.addAll(findAllFilesInDirectory(projectRoot, safeDir));
-      } catch (e) {
-        Ui.printError('Error listing files in ${safeDir.path}: $e');
-      }
+    if (files.isEmpty) {
+      Ui.printWarning(
+          'No files found in the assets directory ${dir.path} (Excluding hidden files)');
+    } else {
+      Ui.printInfo('\nFound ${files.length} files in the assets directory.');
     }
     return files;
   }
 
+  /// Find all files from a set of directories
+  static Set<String> findAllInDirectories(
+      String projectRoot, List<Directory> directories) {
+    final result = <String>{};
+    for (var dir in directories) {
+      result.addAll(findAllInDirectory(projectRoot, dir));
+    }
+    return result;
+  }
+
+  /// Find all string literals used in source code
   static Set<String> findAllStringLiteralsInCode(
       Directory dir, String projectRoot, List<String> ignoredDirs) {
     final allNormalizedLiterals = <String>{};
@@ -128,12 +124,6 @@ class FileHelper {
   static double calculateTotalFileSize(List<File> files) {
     return files.fold(0, (sum, curFile) {
       return curFile.existsSync() ? sum + curFile.lengthSync() : sum;
-    });
-  }
-
-  static double calculateTotalAssetsSize(List<AssetFile?> files) {
-    return files.fold(0, (sum, curFile) {
-      return sum + (curFile?.newSize ?? 0);
     });
   }
 
