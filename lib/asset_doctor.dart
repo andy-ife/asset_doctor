@@ -343,38 +343,4 @@ class AssetDoctor {
       Ui.printInfo('-------------------------');
     }
   }
-
-  /// Compare all asset files with all string literals.
-  ///
-  /// If an asset's filename `foo.png`, path `project/lib/assets/foo.png` or basename without extension `foo`
-  /// is found in the string literals set,
-  /// we make an educated guess that the asset is used.
-  Set<String> getUsedAssetPaths() {
-    Set<String> usedAssetPaths = {};
-    for (final assetPath in allAssetFiles) {
-      final filename = p.basename(assetPath);
-      final basenameWithoutExtension = p.basenameWithoutExtension(assetPath);
-
-      final potentialReferences = [
-        assetPath,
-        filename,
-        basenameWithoutExtension,
-      ];
-
-      final isUsed = allNormalizedLiterals.any((literal) {
-        return potentialReferences.any((ref) => literal.contains(ref));
-      });
-
-      if (isUsed) {
-        try {
-          usedAssetPaths.add(assetPath);
-          spaceBefore += File(assetPath).lengthSync();
-        } catch (e) {
-          // Do nothing. We should almost never throw errors here
-          // And if we do, user already likely uses the asset in his app
-        }
-      }
-    }
-    return usedAssetPaths;
-  }
 }
