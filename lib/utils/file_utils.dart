@@ -3,18 +3,7 @@ import 'dart:io';
 import 'package:asset_doctor/utils/ui.dart';
 import 'package:path/path.dart' as p;
 
-enum Platform { assets, android, ios, macos, windows, linux }
-
 class FileUtils {
-  static const Map<Platform, List<String>> commonAssetLocations = {
-    Platform.assets: ['assets', 'fonts', 'font'],
-    Platform.android: ['android/app/src/main/res'],
-    Platform.ios: ['ios/Runner/Assets.xcassets', 'ios/Runner/Fonts'],
-    Platform.macos: ['macos/Runner/Assets.xcassets', 'macos/Runner/Fonts'],
-    Platform.windows: ['windows/runner/resources', 'windows/runner/fonts'],
-    Platform.linux: ['linux/runner/resources', 'linux/runner/fonts']
-  };
-
   /// Find all files in a directory
   static Set<String> findAllInDirectory(String projectRoot, Directory dir) {
     final files = <String>{};
