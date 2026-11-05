@@ -1,13 +1,21 @@
-import 'dart:io';
-
-import 'package:asset_doctor/utils/ui.dart';
-import 'package:path/path.dart' as p;
+import 'package:asset_doctor/data/file_system_client.dart';
+import 'package:asset_doctor/ui/console.dart';
 
 class FileUtils {
+  const FileUtils({
+    required this.fileSystem,
+    required this.console,
+    required this.projectRoot,
+  });
+
+  final FileSystemClient fileSystem;
+  final Console console;
+  final String projectRoot;
+
   /// Find all files in a directory
-  static Set<String> findAllInDirectory(String projectRoot, Directory dir) {
+  Set<String> findAllInDirectory(String dir) {
     final files = <String>{};
-    if (!dir.existsSync()) {
+    if (!fileSystem.directoryExists(dir)) {
       Ui.printWarning('Assets directory not found at ${dir.path}');
       return files;
     }
@@ -42,8 +50,6 @@ class FileUtils {
     }
     return result;
   }
-
-  
 
   static double calculateTotalFileSize(List<File> files) {
     return files.fold(0, (sum, curFile) {

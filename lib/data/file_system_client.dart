@@ -1,9 +1,9 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:asset_doctor/utils/ui.dart';
 import 'package:path/path.dart' as p;
 
+/// Simple wrapper around dart:io
 class FileSystemClient {
   const FileSystemClient({required this.projectRoot});
   final String projectRoot;
@@ -54,22 +54,21 @@ class FileSystemClient {
   }
 
   Set<String> listFilesSync(String path) {
-    return Directory(path).listSync().map((e) => e.path).toSet();
+    return Directory(path).listSync(recursive: true).map((e) => e.path).toSet();
   }
 
   List<String> getFilesRecursivelyRelative(String dirPath) {
     final files = <String>[];
-    final dir = Directory(dirPath);
-    if (!dir.existsSync()) return files;
+    if (!directoryExists(dirPath)) return files;
     try {
-      for (var entity in dir.listSync(recursive: true)) {
-        if (entity is File) {
-          files.add(
-              p.relative(entity.path, from: projectRoot).replaceAll('\\', '/'));
+      for (var entity in listFilesSync(dirPath)) {
+        if (isFile(entity)) {
+          files
+              .add(p.relative(entity, from: projectRoot).replaceAll('\\', '/'));
         }
       }
     } catch (e) {
-      Ui.printError('Error listing files in ${dir.path}: $e');
+      rethrow;
     }
     return files;
   }
