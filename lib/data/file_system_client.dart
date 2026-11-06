@@ -37,8 +37,8 @@ class FileSystemClient {
     return File(path).length();
   }
 
-  void delete(String path) {
-    return File(path).deleteSync();
+  Future<void> delete(String path) {
+    return File(path).delete();
   }
 
   // ============
@@ -52,6 +52,8 @@ class FileSystemClient {
   bool isDirectory(String path) {
     return directoryExists(path);
   }
+
+  String get currentDir => Directory.current.path;
 
   Set<String> listFilesSync(String path) {
     return Directory(path).listSync(recursive: true).map((e) => e.path).toSet();

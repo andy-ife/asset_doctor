@@ -9,11 +9,13 @@ const String cyan = '\x1B[36m';
 
 /// Simple wrapper around [Stdin] & [Stdout]
 class Console {
+  const Console();
+
   void _print(String value) {
     return print(value);
   }
 
-  void _write(String value) {
+  void write(String value) {
     return stdout.write(value);
   }
 
@@ -54,7 +56,7 @@ class Console {
 
     while (loading) {
       String dots = '.' * ((i % 3) + 1);
-      _write('\r$message$dots');
+      write('\r$message$dots');
       await Future.delayed(const Duration(milliseconds: 300));
     }
   }

@@ -40,19 +40,7 @@ class ExtractPubspecAssetsService {
         .toList();
     final assets = <String>[];
     for (var declaration in assetLines) {
-      final fullPath = p.join(projectRoot, declaration);
-      // final file = File(fullPath);
-      // final dir = Directory(fullPath);
-      // if (file.existsSync()) {
-      //   assets.add(
-      //     p.relative(file.path, from: projectRoot).replaceAll('\\', '/'),
-      //   );
-      // } else if (dir.existsSync()) {
-      //   final filesInDir = _getFilesRecursivelyRelative(dir, projectRoot);
-      //   assets.addAll(filesInDir);
-      // } else {
-      //   // Could not access declared asset
-      // }
+      final fullPath = p.join(projectRoot, declaration).replaceAll('\\', '/');
       assets.add(fullPath);
     }
     return assets;

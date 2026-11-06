@@ -1,0 +1,145 @@
+import 'package:asset_doctor/app/models/clean_result.dart';
+import 'package:asset_doctor/data/file_system_client.dart';
+import 'package:asset_doctor/ui/console.dart';
+import 'package:asset_doctor/ui/tree.dart';
+import 'package:path/path.dart' as p;
+
+class AssetCleaner {
+  AssetCleaner({
+    required this.allAssets,
+    required this.usedAssets,
+    required this.fileSystemClient,
+    String? projectRoot,
+    List<String>? ignoredDirs,
+    Console? console,
+    TreePrinter? tree,
+  }) {
+    this.projectRoot = projectRoot ?? this.fileSystemClient.currentDir;
+    this.ignoredDirs = ignoredDirs ?? ['test', 'build'];
+    this.console = console ?? Console();
+    this.tree = tree ?? TreePrinter();
+  }
+
+  final Set<String> allAssets;
+  final Set<String> usedAssets;
+  final FileSystemClient fileSystemClient;
+
+  late final String projectRoot;
+  late final Console console;
+  late final TreePrinter tree;
+  late final List<String> ignoredDirs; // Folders to ignore during code search
+
+  CleanResult? _result;
+  CleanResult? get result => _result;
+
+  CleanResult analyze() {
+    final usedAssetPaths = usedAssets;
+    final potentialUnusedPaths = allAssets.difference(usedAssetPaths).toList()
+      ..sort();
+    List<String> unusedAssetsForDeletion = <String>[]; // Use List for indexing
+    final localizationAssetsExcluded = <String>[];
+    double spaceBeforeClean = 0;
+
+    for (final assetPath in potentialUnusedPaths) {
+      final path = p.join(projectRoot, assetPath);
+      bool isJson = assetPath.toLowerCase().endsWith('.json');
+      bool isNonEmpty = false;
+      try {
+        if (fileSystemClient.fileExists(path)) {
+          final size = fileSystemClient.lengthSync(path);
+          isNonEmpty = size > 0;
+          spaceBeforeClean += size;
+        }
+      } catch (e) {
+        console.printWarning('Could not check size of "$assetPath": $e');
+        isJson = false;
+      }
+
+      if (isJson && isNonEmpty) {
+        localizationAssetsExcluded.add(assetPath);
+      } else {
+        unusedAssetsForDeletion.add(assetPath);
+      }
+    }
+
+    final unusedTree = tree.build(unusedAssetsForDeletion);
+    final excludedTree = tree.build(localizationAssetsExcluded);
+
+    _result = CleanResult(
+        allAssets: allAssets,
+        usedAssets: usedAssetPaths,
+        unusedAssetsForDeletion: unusedAssetsForDeletion,
+        unusedTree: unusedTree,
+        excludedTree: excludedTree,
+        spaceOfUnusedAssetsBeforeClean: spaceBeforeClean,
+        spaceOfUnusedAssetsAfterClean: spaceBeforeClean,
+        hasAnalyzed: true,
+        hasCleaned: false);
+
+    return _result!;
+  }
+
+  CleanResult? clean() {
+    if (_result == null || _result?.hasAnalyzed == false) {
+      console.printError('Run analysis before cleaning');
+      return null;
+    }
+
+    final curResult = _result!;
+
+    if (curResult.unusedAssetsForDeletion.isNotEmpty) {
+      console.printInfo('Marking all unused assets for deletion...');
+    }
+
+    String? finalConfirm;
+    double freeSpace = 0;
+    console.printInfo(
+        '\nFINAL CONFIRMATION: You are about to delete ${curResult.unusedAssetsForDeletion.length} asset(s).');
+    console.write('Proceed with deletion? (Y/N): ');
+    finalConfirm = console.read();
+    if ((finalConfirm != null &&
+        (finalConfirm.toLowerCase() == 'y' ||
+            finalConfirm.toLowerCase() == 'yes'))) {
+      console.printLoading(
+          message:
+              '\nDeleting ${curResult.unusedAssetsForDeletion.length} assets',
+          work: Future(() async {
+            final freedSpace =
+                await deleteUnusedAssets(curResult.unusedAssetsForDeletion);
+            freeSpace += freedSpace;
+            console.printSuccess(
+                '🎉 You have freed up ${freedSpace.toStringAsFixed(2)} MB of space.');
+          }).asStream());
+    } else {
+      console.printError('Deletion cancelled by user.');
+    }
+
+    // space after should be zero
+    _result = curResult.copyWith(
+        spaceAfterClean: _result!.spaceOfUnusedAssetsAfterClean - freeSpace,
+        hasCleaned: true);
+
+    return _result;
+  }
+
+  Future<double> deleteUnusedAssets(List<String> unusedAssets) async {
+    double totalSizeMB = 0;
+    for (var assetRelativePath in unusedAssets) {
+      final path = p.join(projectRoot, assetRelativePath);
+      if (!fileSystemClient.fileExists(path)) {
+        console.printWarning(
+            'File not found, skipping deletion: "$assetRelativePath"');
+        continue;
+      }
+      try {
+        final fileSize = await fileSystemClient.length(path);
+        totalSizeMB += fileSize / (1024 * 1024);
+        await fileSystemClient.delete(path);
+        console.printSuccess('Deleted: $assetRelativePath');
+      } catch (e) {
+        console.printError('Could not delete "$assetRelativePath": $e');
+      }
+    }
+    return totalSizeMB;
+  }
+}

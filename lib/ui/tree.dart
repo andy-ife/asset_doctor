@@ -52,28 +52,4 @@ class TreePrinter {
     build(paths);
     print();
   }
-
-  // static void printWorkSummary(
-  //     double spaceBefore, double spaceCleaned, double spaceCompressed) {
-  //   // Round to 2 d.p
-  //   final before = (spaceBefore * 100).round() / 100;
-  //   final cleaned = (spaceCleaned * 100).round() / 100;
-  //   final compressed = (spaceCompressed * 100).round() / 100;
-
-  //   printSuccess("Woohoo! You've saved some major space!");
-  //   printSuccess("Space used by assets before: $before");
-
-  //   if (cleaned > 0) {
-  //     printSuccess("Space freed after cleaning: $cleaned");
-  //   }
-
-  //   if (compressed > 0) {
-  //     printSuccess('Space freed after compression: $compressed');
-  //   }
-
-  //   printSuccess('Total space freed: ${cleaned + compressed}');
-
-  //   printSuccess(
-  //       'Percentage freed: ${((cleaned + compressed) / before) * 100}');
-  // }
 }

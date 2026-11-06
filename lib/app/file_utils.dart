@@ -1,59 +1,61 @@
 import 'package:asset_doctor/data/file_system_client.dart';
 import 'package:asset_doctor/ui/console.dart';
+import 'package:path/path.dart' as p;
 
 class FileUtils {
   const FileUtils({
-    required this.fileSystem,
+    required this.client,
     required this.console,
     required this.projectRoot,
   });
 
-  final FileSystemClient fileSystem;
+  final FileSystemClient client;
   final Console console;
   final String projectRoot;
 
   /// Find all files in a directory
-  Set<String> findAllInDirectory(String dir) {
+  Set<String> findAllFilesInDirectory(String dir) {
     final files = <String>{};
-    if (!fileSystem.directoryExists(dir)) {
-      Ui.printWarning('Assets directory not found at ${dir.path}');
+    if (!client.directoryExists(dir)) {
+      console.printWarning('Assets directory not found at $dir');
       return files;
     }
     try {
-      for (var entity in dir.listSync(recursive: true)) {
-        if (entity is File) {
-          if (!p.basename(entity.path).startsWith('.')) {
-            files.add(p
-                .relative(entity.path, from: projectRoot)
-                .replaceAll('\\', '/'));
+      for (var entity in client.listFilesSync(dir)) {
+        if (client.isFile(entity)) {
+          if (!p.basename(entity).startsWith('.')) {
+            files.add(
+                p.relative(entity, from: projectRoot).replaceAll('\\', '/'));
           }
         }
       }
     } catch (e) {
-      Ui.printError('Error listing files in ${dir.path}: $e');
+      console.printError('Error listing files in $dir: $e');
     }
     if (files.isEmpty) {
-      Ui.printWarning(
-          'No files found in the assets directory ${dir.path} (Excluding hidden files)');
+      console.printWarning(
+          'No files found in the assets directory $dir (Excluding hidden files)');
     } else {
-      Ui.printInfo('\nFound ${files.length} files in the assets directory.');
+      console
+          .printInfo('\nFound ${files.length} files in the assets directory.');
     }
     return files;
   }
 
   /// Find all files from a set of directories
-  static Set<String> findAllInDirectories(
-      String projectRoot, List<Directory> directories) {
+  Set<String> findAllFilesInDirectories(List<String> directories) {
     final result = <String>{};
     for (var dir in directories) {
-      result.addAll(findAllInDirectory(projectRoot, dir));
+      result.addAll(findAllFilesInDirectory(dir));
     }
     return result;
   }
 
-  static double calculateTotalFileSize(List<File> files) {
+  double calculateTotalFileSize(List<String> files) {
     return files.fold(0, (sum, curFile) {
-      return curFile.existsSync() ? sum + curFile.lengthSync() : sum;
+      return client.fileExists(curFile)
+          ? sum + client.lengthSync(curFile)
+          : sum;
     });
   }
 }

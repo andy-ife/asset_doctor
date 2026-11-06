@@ -3,3 +3,4 @@
 3. Revamp the printTree, buildTree, displayResults methods.
 4. Wrap libraries in classes for improved testability
 5. Display results by Root assets, Android, iOS, macOS, Windows, and Linux sections
+6. Add getters to assetCleaner and assetCompressor. These are what assetAnalyzer, assetDoctor and others should use to access the cleaner's/compressor's properties

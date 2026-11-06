@@ -1,10 +1,62 @@
 import 'dart:io';
-import 'package:asset_doctor/data/asset_type.dart';
+import 'package:path/path.dart' as p;
+
 import 'package:compressor/compressor.dart' as cp;
 import 'package:image_compression/image_compression.dart';
 
+const imageExtensions = [
+  '.png',
+  '.jpg',
+  '.jpeg',
+  '.jfif',
+  '.tiff',
+  '.gif',
+  '.webp',
+  '.avif',
+  '.bmp'
+];
+
+const videoExtensions = [
+  '.mp4',
+  '.mkv',
+  '.avi',
+];
+
+const audioExtensions = [
+  '.m4a',
+  '.mp3',
+  '.ogg',
+  '.opus',
+];
+
+const textExtensions = [
+  '.yaml',
+  '.json',
+  '.xml',
+  '.txt',
+  '',
+];
+
+enum AssetType { image, video, audio, text, unkown }
+
 class CompressionClient {
   const CompressionClient();
+
+  bool isImage(String path) => imageExtensions.contains(p.extension(path, 2));
+  bool isVideo(String path) => videoExtensions.contains(p.extension(path, 2));
+  bool isAudio(String path) => audioExtensions.contains(p.extension(path, 2));
+  bool isText(String path) => textExtensions.contains(p.extension(path, 2));
+  bool isMedia(String path) => isImage(path) || isVideo(path) || isAudio(path);
+
+  AssetType getAssetType(String path) => isImage(path)
+      ? AssetType.image
+      : isVideo(path)
+          ? AssetType.video
+          : isAudio(path)
+              ? AssetType.audio
+              : isText(path)
+                  ? AssetType.text
+                  : AssetType.unkown;
 
   Future<double> compressImage(String path) async {
     final input =
@@ -36,6 +88,12 @@ class CompressionClient {
         return null;
       case AssetType.unkown:
         return null;
+    }
+  }
+
+  Future<double?> compressAllMedia(Iterable<String> paths) async {
+    for (var p in paths) {
+      await compressMedia(p);
     }
   }
 }

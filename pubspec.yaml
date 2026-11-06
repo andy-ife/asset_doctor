@@ -15,6 +15,7 @@ dependencies:
 
   # Image
   image_compression: ^1.0.5
+  collection: ^1.19.1
 
 dev_dependencies:
   lints: ^6.0.0
