@@ -92,8 +92,11 @@ class CompressionClient {
   }
 
   Future<double?> compressAllMedia(Iterable<String> paths) async {
+    double result = 0;
     for (var p in paths) {
-      await compressMedia(p);
+      final size = await compressMedia(p) ?? 0;
+      result += size;
     }
+    return result;
   }
 }
