@@ -17,10 +17,10 @@ class ExtractPubspecAssetsService {
   ///
   /// [pubspecContent] is the raw text read from the pubspec file
   List<String> run() {
-    assert(
-        nameRegex.hasMatch(pubspecContent) &&
-            environmentRegex.hasMatch(pubspecContent),
-        'Invalid Dart/Flutter pubspec.yaml file. Missing name: and environment: sections');
+    if (!(nameRegex.hasMatch(pubspecContent) &&
+        environmentRegex.hasMatch(pubspecContent))) {
+      throw 'Invalid Dart/Flutter pubspec.yaml file. Missing name: and environment: sections';
+    }
 
     final assetRegex = RegExp(r'assets:\s*((?:\s+-\s+.+\n)+)', multiLine: true);
     final match = assetRegex.firstMatch(pubspecContent);

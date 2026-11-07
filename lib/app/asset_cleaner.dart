@@ -8,13 +8,13 @@ class AssetCleaner {
   AssetCleaner({
     required this.allAssets,
     required this.usedAssets,
-    required this.fileSystemClient,
+    required this.fs,
     String? projectRoot,
     List<String>? ignoredDirs,
     Console? console,
     TreePrinter? tree,
   }) {
-    this.projectRoot = projectRoot ?? this.fileSystemClient.currentDir;
+    this.projectRoot = projectRoot ?? this.fs.currentDir;
     this.ignoredDirs = ignoredDirs ?? ['test', 'build'];
     this.console = console ?? Console();
     this.tree = tree ?? TreePrinter();
@@ -22,7 +22,7 @@ class AssetCleaner {
 
   final Set<String> allAssets;
   final Set<String> usedAssets;
-  final FileSystemClient fileSystemClient;
+  final FileSystemClient fs;
 
   late final String projectRoot;
   late final Console console;
@@ -45,8 +45,8 @@ class AssetCleaner {
       bool isJson = assetPath.toLowerCase().endsWith('.json');
       bool isNonEmpty = false;
       try {
-        if (fileSystemClient.fileExists(path)) {
-          final size = fileSystemClient.lengthSync(path);
+        if (fs.fileExists(path)) {
+          final size = fs.lengthSync(path);
           isNonEmpty = size > 0;
           spaceBeforeClean += size;
         }
@@ -126,15 +126,15 @@ class AssetCleaner {
     double totalSizeMB = 0;
     for (var assetRelativePath in unusedAssets) {
       final path = p.join(projectRoot, assetRelativePath);
-      if (!fileSystemClient.fileExists(path)) {
+      if (!fs.fileExists(path)) {
         console.printWarning(
             'File not found, skipping deletion: "$assetRelativePath"');
         continue;
       }
       try {
-        final fileSize = await fileSystemClient.length(path);
+        final fileSize = await fs.length(path);
         totalSizeMB += fileSize / (1024 * 1024);
-        await fileSystemClient.delete(path);
+        await fs.delete(path);
         console.printSuccess('Deleted: $assetRelativePath');
       } catch (e) {
         console.printError('Could not delete "$assetRelativePath": $e');

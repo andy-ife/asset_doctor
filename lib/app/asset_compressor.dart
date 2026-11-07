@@ -8,8 +8,7 @@ import 'package:path/path.dart' as p;
 class AssetCompressor {
   AssetCompressor({
     required this.usedAssets,
-    required this.fileSystemClient,
-    required this.spaceAfterCleaning,
+    required this.fs,
     CompressionClient? compressor,
     String? projectRoot,
     List<String>? ignoredDirs,
@@ -17,15 +16,14 @@ class AssetCompressor {
     TreePrinter? tree,
   }) {
     this.compressor = compressor ?? CompressionClient();
-    this.projectRoot = projectRoot ?? this.fileSystemClient.currentDir;
+    this.projectRoot = projectRoot ?? this.fs.currentDir;
     this.ignoredDirs = ignoredDirs ?? ['test', 'build'];
     this.console = console ?? Console();
     this.tree = tree ?? TreePrinter();
   }
 
   final Set<String> usedAssets;
-  final FileSystemClient fileSystemClient;
-  final double? spaceAfterCleaning; // clean may have run before compression
+  final FileSystemClient fs;
 
   late final CompressionClient compressor;
   late final String projectRoot;
@@ -38,8 +36,7 @@ class AssetCompressor {
 
   CompressResult analyze() {
     final List<String> assetsForCompression = [];
-    final hasCleaned = spaceAfterCleaning != null;
-    double spaceBeforeCompression = hasCleaned ? spaceAfterCleaning! : 0;
+    double spaceofMediaAssetsBeforeCompress = 0;
 
     final mediaAssets = usedAssets.where((e) => compressor.isMedia(e));
 
@@ -47,12 +44,10 @@ class AssetCompressor {
       final path = p.join(projectRoot, assetPath);
       bool isNonEmpty = false;
       try {
-        if (fileSystemClient.fileExists(path)) {
-          final size = fileSystemClient.lengthSync(path);
+        if (fs.fileExists(path)) {
+          final size = fs.lengthSync(path);
           isNonEmpty = size > 0;
-          if (!hasCleaned) {
-            spaceBeforeCompression += size;
-          }
+          spaceofMediaAssetsBeforeCompress += size;
         }
       } catch (e) {
         console.printWarning('Could not check size of "$assetPath": $e');
@@ -69,15 +64,14 @@ class AssetCompressor {
         usedAssets: usedAssets,
         assetsForCompression: assetsForCompression,
         assetsForCompressionTree: compressTree,
-        spaceOfMediaAssetsBeforeCompress: spaceBeforeCompression,
-        spaceOfMediaAssetsAfterCompress: spaceBeforeCompression,
+        spaceOfMediaAssetsBeforeCompress: spaceofMediaAssetsBeforeCompress,
+        spaceOfMediaAssetsAfterCompress: spaceofMediaAssetsBeforeCompress,
         hasAnalyzed: true,
         hasCompressed: false);
     return _result!;
   }
 
-  CompressResult? compress(
-      {Set<String>? filesLeft, bool compressOnly = false}) {
+  CompressResult? compress() {
     if (_result == null || _result?.hasAnalyzed == false) {
       console.printError('Run analysis before compression');
       return null;
@@ -126,7 +120,7 @@ class AssetCompressor {
   Future<double> compressAssets(List<String> assets) async {
     double result = 0;
     for (var asset in assets) {
-      if (!fileSystemClient.fileExists(asset)) continue;
+      if (!fs.fileExists(asset)) continue;
       print('Compressing $asset...');
       try {
         final res = await compressor.compressMedia(asset);

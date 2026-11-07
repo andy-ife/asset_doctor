@@ -1,5 +1,5 @@
-import 'package:asset_doctor/asset_doctor.dart';
+import 'package:asset_doctor/app.dart';
 
 void main(List<String> arguments) {
-  AssetDoctor().start(arguments);
+  App.start(arguments);
 }

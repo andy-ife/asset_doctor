@@ -4,8 +4,8 @@ import 'package:asset_doctor/ui/console.dart';
 enum CliMode { fullRun, cleanOnly, compressOnly, none }
 
 class Cli {
-  const Cli({required this.console});
-  final Console console;
+  Cli({Console? console}) : this.console = console ?? Console();
+  late final Console console;
 
   CliMode start(List<String> arguments) {
     final parser = ArgParser()

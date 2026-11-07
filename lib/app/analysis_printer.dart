@@ -1,7 +1,6 @@
 import 'package:asset_doctor/app/models/clean_result.dart';
 import 'package:asset_doctor/app/models/compress_result.dart';
 import 'package:asset_doctor/data/file_system_client.dart';
-import 'package:asset_doctor/service/extract_pubspec_assets_service.dart';
 import 'package:asset_doctor/ui/console.dart';
 import 'package:asset_doctor/ui/extension.dart';
 import 'package:asset_doctor/ui/tree.dart';
@@ -9,16 +8,16 @@ import 'package:asset_doctor/ui/tree.dart';
 class AnalysisPrinter {
   AnalysisPrinter(
       {required this.usedAssets,
-      required this.extractPubspecAssetsService,
-      required this.fileSystemClient,
+      required this.pubspecAssets,
+      required this.fs,
       Console? console,
       TreePrinter? tree})
       : console = console ?? const Console(),
         tree = tree ?? TreePrinter();
 
   final Set<String> usedAssets;
-  final ExtractPubspecAssetsService extractPubspecAssetsService;
-  final FileSystemClient fileSystemClient;
+  final List<String> pubspecAssets;
+  final FileSystemClient fs;
 
   late final Console console;
   late final TreePrinter tree;
@@ -103,8 +102,8 @@ class AnalysisPrinter {
   void printPubspecAnalysis() {
     console.printInfo('Checking pubspec.yaml for any skipped assets...');
 
-    final declaredAssetsInPubspec = extractPubspecAssetsService.run().where(
-        (e) => fileSystemClient.isFile(e) || fileSystemClient.isDirectory(e));
+    final declaredAssetsInPubspec =
+        pubspecAssets.where((e) => fs.isFile(e) || fs.isDirectory(e));
 
     if (declaredAssetsInPubspec.isNotEmpty) {
       final unusedDeclaredAssets = declaredAssetsInPubspec
