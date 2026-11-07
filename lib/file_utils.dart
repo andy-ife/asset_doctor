@@ -25,7 +25,7 @@ class FileUtils {
         for (var entity in fs.listFilesSync(projectRoot)) {
           if (fs.isFile(entity) &&
               entity.endsWith('.dart') &&
-              !shouldIgnore(entity)) {
+              !_shouldIgnore(entity)) {
             result.addAll(mapper(entity));
           }
         }
@@ -76,7 +76,7 @@ class FileUtils {
     return result;
   }
 
-  bool shouldIgnore(String path) {
+  bool _shouldIgnore(String path) {
     final filePath = path.replaceAll('\\', '/');
     final rootPath = projectRoot.replaceAll('\\', '/');
     return ignoredDirs.any((dir) {
