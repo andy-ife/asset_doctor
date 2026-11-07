@@ -3,11 +3,7 @@ import 'package:asset_doctor/app/analysis_printer.dart';
 import 'package:asset_doctor/app/asset_cleaner.dart';
 import 'package:asset_doctor/app/asset_compressor.dart';
 import 'package:asset_doctor/asset_doctor.dart';
-import 'package:asset_doctor/file_utils.dart';
-import 'package:asset_doctor/directories.dart';
-import 'package:asset_doctor/service/extract_pubspec_assets_service.dart';
-import 'package:asset_doctor/service/find_all_string_literals_service.dart';
-import 'package:asset_doctor/service/find_used_assets_service.dart';
+import 'package:asset_doctor/app_initialization.dart';
 import 'package:asset_doctor/ui/cli.dart';
 import 'package:path/path.dart' as p;
 
@@ -15,43 +11,39 @@ class App {
   static void start(List<String> args) {
     final projectRoot = Directory.current.path;
     final ignoredDirs = ['test', 'build', 'integration_test'];
-    final fut = FileUtils(projectRoot: projectRoot, ignoredDirs: ignoredDirs);
+    final pubspecPath = p.join(projectRoot, 'pubspec.yaml');
+
+    final app = AppInitialization(
+        projectRoot: projectRoot,
+        ignoredDirs: ignoredDirs,
+        pubspecPath: pubspecPath);
 
     final cliMode = Cli().start(args);
 
+    if (cliMode == CliMode.none) {
+      return;
+    }
+
     // Pubspec
-    final pubspecPath = p.join(projectRoot, 'pubspec.yaml');
-    final pubspecContent = fut.fs.readAsString(pubspecPath);
-    final pubspecAssets = ExtractPubspecAssetsService(
-            pubspecContent: pubspecContent, projectRoot: projectRoot)
-        .run();
+    final pubspecAssets = app.getPubspecAssets();
 
     // String literals
-    final Set<String> normalizedLiterals =
-        fut.mapAllDartFilesInProject((curFile) {
-      final literals =
-          FindAllStringLiteralsService(content: fut.fs.readAsString(curFile))
-              .run();
-      return literals;
-    });
+    final Set<String> allNormalizedLiterals = app.getAllNormalizedLiterals();
 
     // All Assets
-    final assetsDirs = commonAssetLocations.values.expand((e) => e).toList();
-    final allAssets = fut.findAllFilesInDirectories(assetsDirs);
+    final allAssets = app.getAllAssets();
 
     // Used Assets
-    final usedAssets = FindUsedAssetsService(
-            assetFiles: allAssets, allNormalizedLiterals: normalizedLiterals)
-        .run();
+    final usedAssets = app.getUsedAssets(allAssets, allNormalizedLiterals);
 
     // Start
     final assetDoctor = AssetDoctor(
         cliMode: cliMode,
         assetCleaner: AssetCleaner(
-            allAssets: allAssets, usedAssets: usedAssets, fs: fut.fs),
-        assetCompressor: AssetCompressor(usedAssets: usedAssets, fs: fut.fs),
+            allAssets: allAssets, usedAssets: usedAssets, fs: app.fs),
+        assetCompressor: AssetCompressor(usedAssets: usedAssets, fs: app.fs),
         analysisPrinter: AnalysisPrinter(
-            usedAssets: usedAssets, pubspecAssets: pubspecAssets, fs: fut.fs));
+            usedAssets: usedAssets, pubspecAssets: pubspecAssets, fs: app.fs));
 
     assetDoctor.run();
   }
