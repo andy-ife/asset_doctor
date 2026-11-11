@@ -3,8 +3,11 @@ import 'package:asset_doctor/ui/console.dart';
 
 enum CliMode { fullRun, cleanOnly, compressOnly, none }
 
+const PADDING = 32;
+
 class Cli {
-  Cli({Console? console}) : this.console = console ?? Console();
+  Cli({Console? console}) : console = console ?? Console();
+
   late final Console console;
 
   CliMode start(List<String> arguments) {
@@ -14,7 +17,7 @@ class Cli {
         abbr: 'h',
         defaultsTo: false,
       )
-      ..addFlag('full-run', abbr: 'f', defaultsTo: true)
+      ..addFlag('full-run', abbr: 'f', defaultsTo: false)
       ..addFlag('clean-only', abbr: 'c', defaultsTo: false)
       ..addFlag('compress-only', abbr: 'x', defaultsTo: false);
 
@@ -25,7 +28,7 @@ class Cli {
     bool fullRun = argResults['full-run'] as bool;
     final noArgs = !cleanOnly && !compressOnly && !fullRun && !requestingHelp;
 
-    console.printInfo('--Asset Doctor--');
+    showBanner('Asset Doctor');
 
     if (noArgs) {
       console.printInfo('Get started');
@@ -44,7 +47,7 @@ class Cli {
             break;
           case '4':
             showHelp();
-            break;
+            return CliMode.none;
           default:
             console.printError('Invalid option. Please choose 1 - 4');
         }
@@ -71,22 +74,33 @@ class Cli {
     return CliMode.none;
   }
 
+  void showBanner(String title) {
+    console.printHint('\n=============');
+    console.printInfo(title);
+    console.printHint('=============\n');
+  }
+
   void showHelp() {
+    showBanner("Help");
     console.printInfo(
-        'Clean unused Dart/Flutter assets and compress the ones you use. Choose full-run or one option only');
-    console.printInfo('\n`dart run asset_doctor`\n');
+        'Remove (clean) unused assets and compress the ones you use. You can choose clean, compress, or both');
+    console.printInfo("\nMain command:");
+    console.printHint('`dart run asset_doctor`\n');
     console.printInfo('Flags (optional):');
-    console.printInfo('Full run (clean & compress): --full-run, -f');
-    console.printInfo('Clean only: --clean-only, -c');
-    console.printInfo('Compress only: --compress-only, -x');
-    console.printInfo('Help, --help, -h');
+    console.printInfo(
+        '${'-f, --full-run'.padRight(PADDING)}Full run (clean & compress)');
+    console.printInfo('${'-c, --clean-only'.padRight(PADDING)}Clean only');
+    console
+        .printInfo('${'-x, --compress-only'.padRight(PADDING)}Compress only');
+    console.printInfo('${'-h, --help'.padRight(PADDING)}Help');
   }
 
   void showTutorial() {
-    console.printInfo('Choose an option:');
+    console.printInfo('\nOptions:');
     console.printInfo('1. Full run (clean & compress)');
     console.printInfo('2. Clean only');
     console.printInfo('3. Compress only');
     console.printInfo('4. Help');
+    console.write('Choose one (1-4): ');
   }
 }

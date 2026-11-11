@@ -27,8 +27,12 @@ class Console {
     _print('$red$message$reset');
   }
 
-  void printInfo(String message) {
+  void printHint(String message) {
     _print('$cyan$message$reset');
+  }
+
+  void printInfo(String message) {
+    _print(message);
   }
 
   void printWarning(String message) {
