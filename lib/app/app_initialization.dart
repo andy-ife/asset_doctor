@@ -6,6 +6,13 @@ import 'package:asset_doctor/service/find_used_assets_service.dart';
 import 'package:asset_doctor/ui/console.dart';
 import 'package:path/path.dart' as p;
 
+typedef AppInitialData = ({
+  List<String> pubspecAssets,
+  Set<String> allNormalizedLiterals,
+  Set<String> allAssets,
+  Set<String> usedAssets
+});
+
 class AppInitialization {
   AppInitialization({
     required this.projectRoot,
@@ -21,6 +28,24 @@ class AppInitialization {
   final String projectRoot;
   final List<String> ignoredDirs;
   final String pubspecPath;
+
+  Future<AppInitialData> init() async {
+    return await console.printLoading<AppInitialData>(
+        message: "Checking your project",
+        work: Future(() async {
+          final pubspecAssets = getPubspecAssets();
+          final allNormalizedLiterals = getAllNormalizedLiterals();
+          final allAssets = getAllAssets();
+          final usedAssets = getUsedAssets(allAssets, allNormalizedLiterals);
+
+          return (
+            pubspecAssets: pubspecAssets,
+            allNormalizedLiterals: allNormalizedLiterals,
+            allAssets: allAssets,
+            usedAssets: usedAssets
+          );
+        }));
+  }
 
   List<String> getPubspecAssets() {
     final pubspecContent = fs.readAsString(pubspecPath);

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 const String reset = '\x1B[0m';
@@ -53,21 +54,25 @@ class Console {
     _print(message);
   }
 
-  void printLoading({required String message, required Stream work}) async {
-    int i = 0;
+  Future<T> printLoading<T>(
+      {required String message, required Future<T> work}) async {
+    late final T result;
     bool loading = true;
-    work.listen((data) {}, onError: (e) {
+
+    work.then((val) {
+      result = val;
+    }).whenComplete(() {
       loading = false;
-    }, onDone: () {
-      loading = false;
-      // Clear the line and print completion message
-      // stdout.write('\rDone!              \n');
     });
 
-    while (loading) {
+    int i = 0;
+
+    do {
       String dots = '.' * ((i % 3) + 1);
-      write('\r$message$dots');
+      write('\r\n$message$dots');
       await Future.delayed(const Duration(milliseconds: 300));
-    }
+    } while (loading);
+
+    return result;
   }
 }

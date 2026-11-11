@@ -109,7 +109,7 @@ class AssetCleaner {
             freeSpace += freedSpace;
             console.printSuccess(
                 '🎉 You have freed up ${freedSpace.toStringAsFixed(2)} MB of space.');
-          }).asStream());
+          }));
     } else {
       console.printError('Deletion cancelled by user.');
     }
