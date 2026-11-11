@@ -23,6 +23,12 @@ class Console {
     return stdin.readLineSync();
   }
 
+  void printHeader(String title) {
+    printHint('\n=============');
+    printInfo(title);
+    printHint('=============\n');
+  }
+
   void printError(String message) {
     _print('$red$message$reset');
   }

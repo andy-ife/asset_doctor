@@ -22,13 +22,13 @@ class Cli {
       ..addFlag('compress-only', abbr: 'x', defaultsTo: false);
 
     ArgResults argResults = parser.parse(arguments);
-    final requestingHelp = argResults['help'] as bool;
+    bool requestingHelp = argResults['help'] as bool;
     bool cleanOnly = argResults['clean-only'] as bool;
     bool compressOnly = argResults['compress-only'] as bool;
     bool fullRun = argResults['full-run'] as bool;
     final noArgs = !cleanOnly && !compressOnly && !fullRun && !requestingHelp;
 
-    showBanner('Asset Doctor');
+    console.printHeader('Asset Doctor');
 
     if (noArgs) {
       console.printInfo('Get started');
@@ -46,12 +46,12 @@ class Cli {
             compressOnly = true;
             break;
           case '4':
-            showHelp();
-            return CliMode.none;
+            requestingHelp = true;
+            break;
           default:
             console.printError('Invalid option. Please choose 1 - 4');
         }
-      } while (!fullRun && !cleanOnly && !compressOnly);
+      } while (!fullRun && !cleanOnly && !requestingHelp);
     }
 
     if (requestingHelp) {
@@ -74,14 +74,8 @@ class Cli {
     return CliMode.none;
   }
 
-  void showBanner(String title) {
-    console.printHint('\n=============');
-    console.printInfo(title);
-    console.printHint('=============\n');
-  }
-
   void showHelp() {
-    showBanner("Help");
+    console.printHeader("Help");
     console.printInfo(
         'Remove (clean) unused assets and compress the ones you use. You can choose clean, compress, or both');
     console.printInfo("\nMain command:");

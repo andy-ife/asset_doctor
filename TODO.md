@@ -8,3 +8,4 @@
 8. Add support for passing projectRoot and ignoredDirs in app.dart arguments
 9. Improve organisation/location of some files/deps
 10. Consider Move the complex work from app.dart to file_utils
+11. Add analysis cli mode
