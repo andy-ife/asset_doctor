@@ -8,7 +8,23 @@ import 'package:asset_doctor/ui/cli.dart';
 import 'package:path/path.dart' as p;
 
 class App {
+  static void cleanup() async {
+    stdout.write('\n\x1B[?25h'); // show cursor
+  }
+
   static void start(List<String> args) async {
+    ProcessSignal.sigint.watch().listen((signal) {
+      cleanup();
+      exit(0);
+    });
+
+    if (!Platform.isWindows) {
+      ProcessSignal.sigterm.watch().listen((signal) {
+        cleanup();
+        exit(0);
+      });
+    }
+
     final projectRoot = Directory.current.path;
     final ignoredDirs = ['test', 'build', 'integration_test'];
     final pubspecPath = p.join(projectRoot, 'pubspec.yaml');

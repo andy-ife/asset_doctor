@@ -74,7 +74,8 @@ class Console {
       i++;
       await Future.delayed(const Duration(milliseconds: 500));
     } while (loading);
-    stdout.write('\n\x1B[?25h'); // show cursor
+    stdout.write('\x1B[?25h'); // show cursor
+    print('');
     return result;
   }
 }
