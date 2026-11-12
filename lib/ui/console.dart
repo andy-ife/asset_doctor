@@ -22,7 +22,11 @@ class Console {
   }
 
   String? read() {
-    return stdin.readLineSync();
+    try {
+      return stdin.readLineSync();
+    } on StdinException {
+      exit(0); // app cancelled by user (Ctrl+C)
+    }
   }
 
   void printHeader(String title) {
@@ -74,8 +78,7 @@ class Console {
       i++;
       await Future.delayed(const Duration(milliseconds: 500));
     } while (loading);
-    stdout.write('\x1B[?25h'); // show cursor
-    print('');
+    stdout.write('\x1B[?25h\n'); // show cursor
     return result;
   }
 }
