@@ -1,4 +1,6 @@
-0. IMPORTANT!!! Android and iOS usually have multiple variants of the same image e.g 240p, 360p, 480p etc. The OS then automatically selects the correct variant based on the current device. Now, it's highly unlikely that each of these variants will have a direct reference in the code, so they appear unused, but should actually not be deleted. Handle this
+1000. IMPORTANT!!! Android and iOS usually have multiple variants of the same image e.g 240p, 360p, 480p etc. The OS then automatically selects the correct variant based on the current device. Now, it's highly unlikely that each of these variants will have a direct reference in the code, so they appear unused, but should actually not be deleted. Handle this
+
+1001. IMPORTANT!!! How should we handle assets that are found in gitignored folders?
 
 1. What if there is discrepancy between assets declared in pubspec.yaml and actual found files/directories.
 2. Make the main runner more class-like to reduce passing args to every function

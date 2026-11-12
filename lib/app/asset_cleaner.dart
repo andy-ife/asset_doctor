@@ -14,7 +14,7 @@ class AssetCleaner {
     Console? console,
     TreePrinter? tree,
   }) {
-    this.projectRoot = projectRoot ?? this.fs.currentDir;
+    this.projectRoot = projectRoot ?? fs.currentDir;
     this.ignoredDirs = ignoredDirs ?? ['test', 'build'];
     this.console = console ?? Console();
     this.tree = tree ?? TreePrinter();
@@ -105,7 +105,7 @@ class AssetCleaner {
               '\nDeleting ${curResult.unusedAssetsForDeletion.length} assets',
           work: () async {
             final freedSpace =
-                await deleteUnusedAssets(curResult.unusedAssetsForDeletion);
+                deleteUnusedAssets(curResult.unusedAssetsForDeletion);
             freeSpace += freedSpace;
             console.printSuccess(
                 '🎉 You have freed up ${freedSpace.toStringAsFixed(2)} MB of space.');
@@ -124,7 +124,7 @@ class AssetCleaner {
     return _result;
   }
 
-  Future<double> deleteUnusedAssets(List<String> unusedAssets) async {
+  double deleteUnusedAssets(List<String> unusedAssets) {
     double totalSizeMB = 0;
     for (var assetRelativePath in unusedAssets) {
       final path = p.join(projectRoot, assetRelativePath);
@@ -134,9 +134,9 @@ class AssetCleaner {
         continue;
       }
       try {
-        final fileSize = await fs.length(path);
+        final fileSize = fs.lengthSync(path);
         totalSizeMB += fileSize / (1024 * 1024);
-        await fs.delete(path);
+        fs.deleteSync(path);
         console.printSuccess('Deleted: $assetRelativePath');
       } catch (e) {
         console.printError('Could not delete "$assetRelativePath": $e');

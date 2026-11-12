@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:path/path.dart' as p;
 
 import 'package:compressor/compressor.dart' as cp;
-import 'package:image_compression/image_compression.dart';
+import 'package:image_compression/image_compression.dart' as img;
 
 const imageExtensions = [
   '.png',
@@ -58,25 +58,25 @@ class CompressionClient {
                   ? AssetType.text
                   : AssetType.unkown;
 
-  Future<double> compressImage(String path) async {
+  double compressImage(String path) {
     final input =
-        ImageFile(filePath: path, rawBytes: File(path).readAsBytesSync());
-    final output = await compressInQueue(ImageFileConfiguration(input: input));
+        img.ImageFile(filePath: path, rawBytes: File(path).readAsBytesSync());
+    final output = img.compress(img.ImageFileConfiguration(input: input));
     return output.sizeInBytes.toDouble();
   }
 
-  Future<double> compressVideo(String path) async {
+  double compressVideo(String path) {
     final compressor = cp.Compressor(path: path, isLocal: true);
     compressor.compressVideo();
     return File(path).lengthSync().toDouble();
   }
 
-  Future<double?> compressAudio(String path) async {
-    print("Audio compression unsupported. Skipping $path");
+  double? compressAudio(String path) {
+    // print("Audio compression unsupported. Skipping $path");
     return null;
   }
 
-  Future<double?> compressMedia(String path) async {
+  double? compressMedia(String path) {
     switch (getAssetType(path)) {
       case AssetType.image:
         return compressImage(path);
@@ -91,10 +91,19 @@ class CompressionClient {
     }
   }
 
-  Future<double?> compressAllMedia(Iterable<String> paths) async {
+  double? compressAllMedia(Iterable<String> paths) {
     double result = 0;
     for (var p in paths) {
-      final size = await compressMedia(p) ?? 0;
+      final size = compressMedia(p) ?? 0;
+      result += size;
+    }
+    return result;
+  }
+
+  double? compressAllMediaSync(Iterable<String> paths) {
+    double result = 0;
+    for (var p in paths) {
+      final size = compressMedia(p) ?? 0;
       result += size;
     }
     return result;

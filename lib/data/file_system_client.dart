@@ -41,6 +41,10 @@ class FileSystemClient {
     return File(path).delete();
   }
 
+  void deleteSync(String path) {
+    return File(path).deleteSync();
+  }
+
   // ============
   // Directory
   // ============

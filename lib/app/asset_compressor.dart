@@ -95,9 +95,9 @@ class AssetCompressor {
       console.printLoading(
           message:
               '\nCompressing ${curResult.assetsForCompression.length} assets',
-          work: () async {
-            final freedSpace = await compressor
-                .compressAllMedia(curResult.assetsForCompression);
+          work: () {
+            final freedSpace =
+                compressor.compressAllMedia(curResult.assetsForCompression);
             freeSpace += freedSpace ?? 0;
             if (freedSpace != null) {
               console.printSuccess(
