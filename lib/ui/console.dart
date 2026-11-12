@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:isolate';
 
 const String reset = '\x1B[0m';
 const String red = '\x1B[31m';
@@ -55,24 +56,25 @@ class Console {
   }
 
   Future<T> printLoading<T>(
-      {required String message, required Future<T> work}) async {
+      {required String message, required T Function() work}) async {
     late final T result;
     bool loading = true;
 
-    work.then((val) {
-      result = val;
+    Isolate.run(work).then((data) {
+      result = data;
     }).whenComplete(() {
       loading = false;
     });
 
     int i = 0;
-
+    stdout.write('\x1B[?25l\n'); // hide cursor
     do {
       String dots = '.' * ((i % 3) + 1);
-      write('\r\n$message$dots');
-      await Future.delayed(const Duration(milliseconds: 300));
+      write('\r$message${dots.padRight(4)}');
+      i++;
+      await Future.delayed(const Duration(milliseconds: 500));
     } while (loading);
-
+    stdout.write('\n\x1B[?25h'); // show cursor
     return result;
   }
 }

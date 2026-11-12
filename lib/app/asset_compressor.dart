@@ -95,7 +95,7 @@ class AssetCompressor {
       console.printLoading(
           message:
               '\nCompressing ${curResult.assetsForCompression.length} assets',
-          work: Future(() async {
+          work: () async {
             final freedSpace = await compressor
                 .compressAllMedia(curResult.assetsForCompression);
             freeSpace += freedSpace ?? 0;
@@ -103,7 +103,7 @@ class AssetCompressor {
               console.printSuccess(
                   '🎉 You have freed up ${freedSpace.toStringAsFixed(2)} MB of space.');
             }
-          }));
+          });
     } else {
       console.printError('Deletion cancelled by user.');
     }

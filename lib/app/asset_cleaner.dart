@@ -103,13 +103,13 @@ class AssetCleaner {
       console.printLoading(
           message:
               '\nDeleting ${curResult.unusedAssetsForDeletion.length} assets',
-          work: Future(() async {
+          work: () async {
             final freedSpace =
                 await deleteUnusedAssets(curResult.unusedAssetsForDeletion);
             freeSpace += freedSpace;
             console.printSuccess(
                 '🎉 You have freed up ${freedSpace.toStringAsFixed(2)} MB of space.');
-          }));
+          });
     } else {
       console.printError('Deletion cancelled by user.');
     }

@@ -31,8 +31,8 @@ class AppInitialization {
 
   Future<AppInitialData> init() async {
     return await console.printLoading<AppInitialData>(
-        message: "Checking your project",
-        work: Future(() async {
+        message: "Finding project assets",
+        work: () {
           final pubspecAssets = getPubspecAssets();
           final allNormalizedLiterals = getAllNormalizedLiterals();
           final allAssets = getAllAssets();
@@ -44,7 +44,7 @@ class AppInitialization {
             allAssets: allAssets,
             usedAssets: usedAssets
           );
-        }));
+        });
   }
 
   List<String> getPubspecAssets() {
