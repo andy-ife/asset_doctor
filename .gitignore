@@ -8,3 +8,20 @@ pubspec.lock
 
 # FVM Version Cache
 .fvm/
+
+# Test folders for development
+assets/
+fonts/
+font/
+android/app/src/main/res/
+ios/Runner/Assets.xcassets/
+ios/Runner/Fonts/
+macos/Runner/Assets.xcassets/
+macos/Runner/fonts/
+windows/runner/resources/
+windows/runner/fonts/
+linux/runner/resources/
+linux/runner/fonts/
+
+# Script for restoring my test assets during dev
+restore_test_assets.sh

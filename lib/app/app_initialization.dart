@@ -128,7 +128,7 @@ class AppInitialization {
       console.printWarning(
           '\nNo files found in the assets directory $dir (Excluding hidden files)');
     } else {
-      console.printInfo('\nFound ${files.length} files in $dir.');
+      console.printHint('\nFound ${files.length} files in $dir.');
     }
     return files;
   }
