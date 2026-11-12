@@ -28,7 +28,9 @@ class AssetDoctor {
           if (compressResult == null) return;
 
           analysisPrinter.printPubspecAnalysis();
-          analysisPrinter.printWorkSummary(cleanResult, compressResult);
+          if (cleanResult.hasCleaned || compressResult.hasCompressed) {
+            analysisPrinter.printWorkSummary(cleanResult, compressResult);
+          }
           break;
         }
 
@@ -38,7 +40,9 @@ class AssetDoctor {
           if (result == null) return;
 
           analysisPrinter.printPubspecAnalysis();
-          analysisPrinter.printWorkSummary(result, null);
+          if (result.hasCleaned) {
+            analysisPrinter.printWorkSummary(result, null);
+          }
           break;
         }
       case CliMode.compressOnly:
@@ -47,7 +51,9 @@ class AssetDoctor {
           if (result == null) return;
 
           analysisPrinter.printPubspecAnalysis();
-          analysisPrinter.printWorkSummary(null, result);
+          if (result.hasCompressed) {
+            analysisPrinter.printWorkSummary(null, result);
+          }
           break;
         }
       case CliMode.none:

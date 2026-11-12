@@ -112,6 +112,8 @@ class AssetCleaner {
           });
     } else {
       console.printError('Deletion cancelled by user.');
+      _result = curResult.copyWith(hasCleaned: false);
+      return _result;
     }
 
     // space after should be zero

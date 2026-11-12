@@ -40,7 +40,7 @@ class Console {
   }
 
   void printError(String message) {
-    _print('$red$message$reset');
+    _print('\n$red$message$reset\n');
   }
 
   void printHint(String message) {

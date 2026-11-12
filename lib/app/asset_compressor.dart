@@ -105,7 +105,9 @@ class AssetCompressor {
             }
           });
     } else {
-      console.printError('Deletion cancelled by user.');
+      console.printError('Compression cancelled by user.');
+      _result = curResult.copyWith(hasCompressed: false);
+      return _result;
     }
 
     _result = curResult.copyWith(
