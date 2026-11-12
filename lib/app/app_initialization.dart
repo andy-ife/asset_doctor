@@ -105,10 +105,11 @@ class AppInitialization {
   }
 
   /// Find all files in a directory
-  Set<String> _findAllFilesInDirectory(String dir) {
+  Set<String> _findAllFilesInDirectory(String dir, {bool isFirst = false}) {
     final files = <String>{};
     if (!fs.directoryExists(dir)) {
-      console.printWarning('Assets directory not found at $dir');
+      console.printWarning(
+          '${isFirst ? '\n' : ''}Assets directory not found at $dir');
       return files;
     }
     for (var entity in fs.listFilesSync(dir)) {
@@ -125,7 +126,7 @@ class AppInitialization {
     }
     if (files.isEmpty) {
       console.printWarning(
-          'No files found in the assets directory $dir (Excluding hidden files)');
+          '\nNo files found in the assets directory $dir (Excluding hidden files)');
     } else {
       console
           .printInfo('\nFound ${files.length} files in the assets directory.');
@@ -137,7 +138,8 @@ class AppInitialization {
   Set<String> _findAllFilesInDirectories(List<String> directories) {
     final result = <String>{};
     for (var dir in directories) {
-      result.addAll(_findAllFilesInDirectory(dir));
+      result.addAll(
+          _findAllFilesInDirectory(dir, isFirst: directories.first == dir));
     }
     return result;
   }

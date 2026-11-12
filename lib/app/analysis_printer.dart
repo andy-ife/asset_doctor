@@ -23,9 +23,9 @@ class AnalysisPrinter {
   late final TreePrinter tree;
 
   void printCleanAnalysis(CleanResult result) {
-    console.printInfo('\n--Asset Usage Analysis--');
+    console.printHeader('Asset Usage Analysis');
     console.printInfo(
-        '\nPotentially Used assets (Found in assets/ and path/name found as a string somewhere in the code):');
+        'Potentially Used assets (Found in assets/ and path/name found as a string somewhere in the code):');
     if (result.usedAssets.isNotEmpty) {
       for (var asset in result.usedAssets) {
         console.printDefault('• $asset');
@@ -68,12 +68,12 @@ class AnalysisPrinter {
       console.printInfo(
           '• Percentage unused (for deletion): ${((totalUnusedForDeletion / totalAssetsInDir) * 100).toStringAsFixed(2)}%');
     }
-    console.printInfo('---------------------------');
+    console.printDivider();
   }
 
   void printCompressAnalysis(CompressResult result) {
-    console.printInfo('\n--Asset Compression Analysis--');
-    console.printWarning('\nAssets MARKED FOR COMPRESSION:');
+    console.printHeader('Asset Compression Analysis');
+    console.printWarning('Assets MARKED FOR COMPRESSION:');
     if (result.assetsForCompression.isNotEmpty) {
       console.printWarning('(${result.assetsForCompression.length} files)');
       tree.print(paths: result.assetsForCompressionTree, prefix: '');
@@ -96,7 +96,7 @@ class AnalysisPrinter {
       console.printInfo(
           '• Percentage selected for compression: ${((totalForCompression / totalAssets) * 100).toStringAsFixed(2)}%');
     }
-    console.printInfo('---------------------------');
+    console.printDivider();
   }
 
   void printPubspecAnalysis() {

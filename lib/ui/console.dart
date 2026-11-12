@@ -35,6 +35,10 @@ class Console {
     printHint('=============\n');
   }
 
+  void printDivider() {
+    printHint('=============');
+  }
+
   void printError(String message) {
     _print('$red$message$reset');
   }
@@ -71,14 +75,14 @@ class Console {
     });
 
     int i = 0;
-    stdout.write('\x1B[?25l\n'); // hide cursor
+    write('\x1B[?25l\n'); // hide cursor
     do {
       String dots = '.' * ((i % 3) + 1);
       write('\r$message${dots.padRight(4)}');
       i++;
       await Future.delayed(const Duration(milliseconds: 500));
     } while (loading);
-    stdout.write('\x1B[?25h\n'); // show cursor
+    write('\x1B[?25h'); // show cursor
     return result;
   }
 }

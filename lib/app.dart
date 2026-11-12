@@ -57,5 +57,6 @@ class App {
             fs: app.fs));
 
     assetDoctor.run();
+    exit(0);
   }
 }
