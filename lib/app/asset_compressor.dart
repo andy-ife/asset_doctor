@@ -71,7 +71,7 @@ class AssetCompressor {
     return _result!;
   }
 
-  CompressResult? compress() {
+  Future<CompressResult?> compress() async {
     if (_result == null || _result?.hasAnalyzed == false) {
       console.printError('Run analysis before compression');
       return null;
@@ -92,7 +92,7 @@ class AssetCompressor {
     if ((finalConfirm != null &&
         (finalConfirm.toLowerCase() == 'y' ||
             finalConfirm.toLowerCase() == 'yes'))) {
-      console.printLoading(
+      await console.printLoading(
           message:
               '\nCompressing ${curResult.assetsForCompression.length} assets',
           work: () {
@@ -125,7 +125,7 @@ class AssetCompressor {
       if (!fs.fileExists(asset)) continue;
       print('Compressing $asset...');
       try {
-        final res = await compressor.compressMedia(asset);
+        final res = compressor.compressMedia(asset);
         result += res ?? 0;
       } catch (e) {
         console.printError('Error compressing $asset: $e');

@@ -17,14 +17,14 @@ class AssetDoctor {
   final AssetCompressor assetCompressor;
   final AnalysisPrinter analysisPrinter;
 
-  void run() {
+  void run() async {
     switch (cliMode) {
       case CliMode.fullRun:
         {
-          final cleanResult = clean();
+          final cleanResult = await clean();
           if (cleanResult == null) return;
 
-          final compressResult = compress();
+          final compressResult = await compress();
           if (compressResult == null) return;
 
           analysisPrinter.printPubspecAnalysis();
@@ -36,7 +36,7 @@ class AssetDoctor {
 
       case CliMode.cleanOnly:
         {
-          final result = clean();
+          final result = await clean();
           if (result == null) return;
 
           analysisPrinter.printPubspecAnalysis();
@@ -47,7 +47,7 @@ class AssetDoctor {
         }
       case CliMode.compressOnly:
         {
-          final result = compress();
+          final result = await compress();
           if (result == null) return;
 
           analysisPrinter.printPubspecAnalysis();
@@ -63,7 +63,7 @@ class AssetDoctor {
     }
   }
 
-  CleanResult? clean() {
+  Future<CleanResult?> clean() {
     final result0 = assetCleaner.analyze();
     analysisPrinter.printCleanAnalysis(result0);
 
@@ -71,7 +71,7 @@ class AssetDoctor {
     return result1;
   }
 
-  CompressResult? compress() {
+  Future<CompressResult?> compress() {
     final compress0 = assetCompressor.analyze();
     analysisPrinter.printCompressAnalysis(compress0);
 

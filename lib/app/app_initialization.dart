@@ -29,9 +29,9 @@ class AppInitialization {
   final List<String> ignoredDirs;
   final String pubspecPath;
 
-  Future<AppInitialData> init() async {
-    return await console.printLoading<AppInitialData>(
-        message: "Finding project assets",
+  Future<AppInitialData> init() {
+    return console.printLoading<AppInitialData>(
+        message: "Finding project assets and usage",
         work: () {
           final pubspecAssets = getPubspecAssets();
           final allNormalizedLiterals = getAllNormalizedLiterals();

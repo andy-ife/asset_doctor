@@ -9,7 +9,7 @@ import 'package:path/path.dart' as p;
 
 class App {
   static void cleanup() async {
-    stdout.write('\n\x1B[?25h'); // show cursor
+    stdout.write('\x1B[?25h'); // show cursor
   }
 
   static void start(List<String> args) async {

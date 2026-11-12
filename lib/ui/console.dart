@@ -25,6 +25,7 @@ class Console {
     try {
       return stdin.readLineSync();
     } on StdinException {
+      stdout.write('\x1B[?25h'); // show cursor
       exit(0); // app cancelled by user (Ctrl+C)
     }
   }
@@ -82,7 +83,7 @@ class Console {
       i++;
       await Future.delayed(const Duration(milliseconds: 500));
     } while (loading);
-    write('\x1B[?25h'); // show cursor
+    write('\x1B[?25h\n'); // show cursor
     return result;
   }
 }

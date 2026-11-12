@@ -79,7 +79,7 @@ class AssetCleaner {
     return _result!;
   }
 
-  CleanResult? clean() {
+  Future<CleanResult?> clean() async {
     if (_result == null || _result?.hasAnalyzed == false) {
       console.printError('Run analysis before cleaning');
       return null;
@@ -100,7 +100,7 @@ class AssetCleaner {
     if ((finalConfirm != null &&
         (finalConfirm.toLowerCase() == 'y' ||
             finalConfirm.toLowerCase() == 'yes'))) {
-      console.printLoading(
+      await console.printLoading(
           message:
               '\nDeleting ${curResult.unusedAssetsForDeletion.length} assets',
           work: () async {
