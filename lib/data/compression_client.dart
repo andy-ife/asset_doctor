@@ -99,13 +99,4 @@ class CompressionClient {
     }
     return result;
   }
-
-  double? compressAllMediaSync(Iterable<String> paths) {
-    double result = 0;
-    for (var p in paths) {
-      final size = compressMedia(p) ?? 0;
-      result += size;
-    }
-    return result;
-  }
 }
