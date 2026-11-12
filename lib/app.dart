@@ -56,7 +56,7 @@ class App {
             pubspecAssets: initialData.pubspecAssets,
             fs: app.fs));
 
-    assetDoctor.run();
+    await assetDoctor.run();
     exit(0);
   }
 }

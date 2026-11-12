@@ -17,7 +17,7 @@ class AssetDoctor {
   final AssetCompressor assetCompressor;
   final AnalysisPrinter analysisPrinter;
 
-  void run() async {
+  Future<void> run() async {
     switch (cliMode) {
       case CliMode.fullRun:
         {
@@ -63,19 +63,19 @@ class AssetDoctor {
     }
   }
 
-  Future<CleanResult?> clean() {
+  Future<CleanResult?> clean() async {
     final result0 = assetCleaner.analyze();
     analysisPrinter.printCleanAnalysis(result0);
 
-    final result1 = assetCleaner.clean();
+    final result1 = await assetCleaner.clean();
     return result1;
   }
 
-  Future<CompressResult?> compress() {
+  Future<CompressResult?> compress() async {
     final compress0 = assetCompressor.analyze();
     analysisPrinter.printCompressAnalysis(compress0);
 
-    final compress1 = assetCompressor.compress();
+    final compress1 = await assetCompressor.compress();
     return compress1;
   }
 }

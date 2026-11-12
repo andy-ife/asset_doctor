@@ -100,7 +100,7 @@ class AssetCleaner {
     if ((finalConfirm != null &&
         (finalConfirm.toLowerCase() == 'y' ||
             finalConfirm.toLowerCase() == 'yes'))) {
-      await console.printLoading(
+      await console.printLoading<void>(
           message:
               '\nDeleting ${curResult.unusedAssetsForDeletion.length} assets',
           work: () async {

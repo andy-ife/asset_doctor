@@ -92,7 +92,7 @@ class AssetCompressor {
     if ((finalConfirm != null &&
         (finalConfirm.toLowerCase() == 'y' ||
             finalConfirm.toLowerCase() == 'yes'))) {
-      await console.printLoading(
+      await console.printLoading<void>(
           message:
               '\nCompressing ${curResult.assetsForCompression.length} assets',
           work: () {

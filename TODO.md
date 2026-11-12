@@ -14,3 +14,4 @@
 10. Consider Move the complex work from app.dart to file_utils
 11. Add analysis cli mode
 12. Upgrade image_compression dep. It depends on mime 1.0.0 which is causing issues in some projects
+13. Handle errors in the application layer

@@ -1,3 +1,4 @@
 {
-  "dart.flutterSdkPath": ".fvm/versions/3.47.6"
+  "dart.flutterSdkPath": ".fvm/versions/3.47.6",
+  "dart.cliConsole": "terminal"
 }
