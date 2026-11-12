@@ -56,17 +56,33 @@ class AnalysisPrinter {
     int totalLocalizationExcluded = countFilesInTree(result.excludedTree);
     final totalUnused = totalUnusedForDeletion + totalLocalizationExcluded;
     console.printInfo('\nSummary:');
-    console.printInfo('• Total assets (excluding hidden): $totalAssetsInDir');
-    console.printInfo('• Potentially Used assets: $totalUsedAssets');
-    console.printInfo('• Unused assets (Total): $totalUnused');
+    console.printDivider();
+
+    console.printInfo('• Total assets (excluding hidden): ',
+        end: totalAssetsInDir.toString());
+
+    console.printInfo('• Potentially Used assets: ',
+        end: totalUsedAssets.toString());
+
     console.printInfo(
-        '  • Excluded (e.g., non-empty JSON): $totalLocalizationExcluded');
-    console.printInfo('  • Marked for deletion: $totalUnusedForDeletion');
+      '• Unused assets (Total): ',
+      end: totalUnused.toString(),
+    );
+
+    console.printInfo('  - Excluded (e.g., non-empty JSON): ',
+        end: totalLocalizationExcluded.toString());
+
+    console.printInfo('  - Marked for deletion: ',
+        end: totalUnusedForDeletion.toString());
+
     if (totalAssetsInDir > 0) {
-      console.printInfo(
-          '• Percentage used: ${((totalUsedAssets / totalAssetsInDir) * 100).toStringAsFixed(2)}%');
-      console.printInfo(
-          '• Percentage unused (for deletion): ${((totalUnusedForDeletion / totalAssetsInDir) * 100).toStringAsFixed(2)}%');
+      console.printInfo('• Percentage used: ',
+          end:
+              '${((totalUsedAssets / totalAssetsInDir) * 100).toStringAsFixed(2)}%');
+
+      console.printInfo('• Percentage unused (for deletion): ',
+          end:
+              '${((totalUnusedForDeletion / totalAssetsInDir) * 100).toStringAsFixed(2)}%');
     }
     console.printDivider();
   }
@@ -88,13 +104,20 @@ class AnalysisPrinter {
         result.usedAssets.difference(selectedAssets).length;
 
     console.printInfo('\nSummary:');
-    console.printInfo('• Total assets (excluding hidden): $totalAssets');
-    console.printInfo('• Assets marked for compression: $totalForCompression');
-    console
-        .printInfo('• Assets not selected for compression: $totalNotSelected');
+    console.printDivider();
+    console.printInfo('• Total assets (excluding hidden): ',
+        end: totalAssets.toString());
+
+    console.printInfo('• Assets marked for compression: ',
+        end: totalForCompression.toString());
+
+    console.printInfo('• Assets not selected for compression: ',
+        end: totalNotSelected.toString());
+
     if (totalAssets > 0) {
-      console.printInfo(
-          '• Percentage selected for compression: ${((totalForCompression / totalAssets) * 100).toStringAsFixed(2)}%');
+      console.printInfo('• Percentage selected for compression: ',
+          end:
+              '${((totalForCompression / totalAssets) * 100).toStringAsFixed(2)}%');
     }
     console.printDivider();
   }

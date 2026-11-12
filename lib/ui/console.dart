@@ -7,7 +7,7 @@ const String red = '\x1B[31m';
 const String green = '\x1B[32m';
 const String yellow = '\x1B[33m';
 const String blue = '\x1B[34m';
-const String cyan = '\x1B[36m';
+const String cyan = '\x1B[96m';
 
 /// Simple wrapper around [Stdin] & [Stdout]
 class Console {
@@ -48,8 +48,8 @@ class Console {
     _print('$cyan$message$reset');
   }
 
-  void printInfo(String message) {
-    _print(message);
+  void printInfo(String message, {String? end}) {
+    _print('$message${end != null ? '$cyan$end$reset' : ''}');
   }
 
   void printWarning(String message) {
@@ -75,7 +75,7 @@ class Console {
       loading = false;
     });
 
-    int i = 0;
+    int i = 2;
     write('\x1B[?25l\n'); // hide cursor
     do {
       String dots = '.' * ((i % 3) + 1);

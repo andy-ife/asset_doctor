@@ -127,6 +127,7 @@ class AssetCleaner {
   double deleteUnusedAssets(List<String> unusedAssets) {
     double totalSizeMB = 0;
     for (var assetRelativePath in unusedAssets) {
+      final isFirst = unusedAssets.first == assetRelativePath;
       final path = p.join(projectRoot, assetRelativePath);
       if (!fs.fileExists(path)) {
         console.printWarning(
@@ -137,7 +138,8 @@ class AssetCleaner {
         final fileSize = fs.lengthSync(path);
         totalSizeMB += fileSize / (1024 * 1024);
         fs.deleteSync(path);
-        console.printSuccess('Deleted: $assetRelativePath');
+        console
+            .printSuccess('${isFirst ? '\n' : ''}Deleted: $assetRelativePath');
       } catch (e) {
         console.printError('Could not delete "$assetRelativePath": $e');
       }
