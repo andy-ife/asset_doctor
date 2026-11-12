@@ -2,6 +2,7 @@ import 'package:asset_doctor/app/models/compress_result.dart';
 import 'package:asset_doctor/data/compression_client.dart';
 import 'package:asset_doctor/data/file_system_client.dart';
 import 'package:asset_doctor/ui/console.dart';
+import 'package:asset_doctor/ui/extension.dart';
 import 'package:asset_doctor/ui/tree.dart';
 import 'package:path/path.dart' as p;
 
@@ -94,14 +95,14 @@ class AssetCompressor {
             finalConfirm.toLowerCase() == 'yes'))) {
       await console.printLoading<void>(
           message:
-              '\nCompressing ${curResult.assetsForCompression.length} assets',
+              'Compressing ${curResult.assetsForCompression.length} assets',
           work: () {
-            final freedSpace =
+            final freed =
                 compressor.compressAllMedia(curResult.assetsForCompression);
-            freeSpace += freedSpace ?? 0;
-            if (freedSpace != null) {
+            freeSpace += freed ?? 0;
+            if (freed != null) {
               console.printSuccess(
-                  '🎉 You have freed up ${freedSpace.toStringAsFixed(2)} MB of space.');
+                  '\n🎉 You have freed up ${freeSpace.toStorageString()} of space.');
             }
           });
     } else {

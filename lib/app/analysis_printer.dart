@@ -194,7 +194,7 @@ class AnalysisPrinter {
         ? null
         : (compressResult.spaceOfMediaAssetsAfterCompress * 100).round() / 100;
 
-    console.printSuccess("Woohoo! You've saved some major space!");
+    console.printHeader("Final Work Summary");
 
     if (cleanResult != null) {
       console.printSuccess(

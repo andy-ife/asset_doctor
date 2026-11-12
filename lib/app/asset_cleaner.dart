@@ -1,6 +1,7 @@
 import 'package:asset_doctor/app/models/clean_result.dart';
 import 'package:asset_doctor/data/file_system_client.dart';
 import 'package:asset_doctor/ui/console.dart';
+import 'package:asset_doctor/ui/extension.dart';
 import 'package:asset_doctor/ui/tree.dart';
 import 'package:path/path.dart' as p;
 
@@ -102,13 +103,13 @@ class AssetCleaner {
             finalConfirm.toLowerCase() == 'yes'))) {
       await console.printLoading<void>(
           message:
-              '\nDeleting ${curResult.unusedAssetsForDeletion.length} assets',
+              'Deleting ${curResult.unusedAssetsForDeletion.length} assets',
           work: () async {
             final freedSpace =
                 deleteUnusedAssets(curResult.unusedAssetsForDeletion);
             freeSpace += freedSpace;
             console.printSuccess(
-                '🎉 You have freed up ${freedSpace.toStringAsFixed(2)} MB of space.');
+                '\n🎉 You have freed up ${freedSpace.toStorageString()} of space.');
           });
     } else {
       console.printError('Deletion cancelled by user.');
@@ -125,7 +126,7 @@ class AssetCleaner {
   }
 
   double deleteUnusedAssets(List<String> unusedAssets) {
-    double totalSizeMB = 0;
+    double totalSize = 0;
     for (var assetRelativePath in unusedAssets) {
       final isFirst = unusedAssets.first == assetRelativePath;
       final path = p.join(projectRoot, assetRelativePath);
@@ -136,7 +137,7 @@ class AssetCleaner {
       }
       try {
         final fileSize = fs.lengthSync(path);
-        totalSizeMB += fileSize / (1024 * 1024);
+        totalSize += fileSize;
         fs.deleteSync(path);
         console
             .printSuccess('${isFirst ? '\n' : ''}Deleted: $assetRelativePath');
@@ -144,6 +145,6 @@ class AssetCleaner {
         console.printError('Could not delete "$assetRelativePath": $e');
       }
     }
-    return totalSizeMB;
+    return totalSize;
   }
 }
