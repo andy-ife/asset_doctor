@@ -9,6 +9,7 @@ const imageExtensions = [
   '.jpg',
   '.jpeg',
   '.jfif',
+  '.svg',
   '.tiff',
   '.gif',
   '.webp',
@@ -20,6 +21,7 @@ const videoExtensions = [
   '.mp4',
   '.mkv',
   '.avi',
+  '.webm',
 ];
 
 const audioExtensions = [
@@ -27,6 +29,7 @@ const audioExtensions = [
   '.mp3',
   '.ogg',
   '.opus',
+  '.wav',
 ];
 
 const textExtensions = [

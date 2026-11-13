@@ -7,9 +7,9 @@ import 'package:asset_doctor/app/app_initialization.dart';
 import 'package:asset_doctor/ui/cli.dart';
 import 'package:path/path.dart' as p;
 
-const test_asset_reference = 'test_pic1.jpg';
 const test_asset_reference2 = 'test_pic2.jpg';
-const test_asset_reference3 = 'test_vid.mp4';
+const test_asset_reference3 = 'test_vid1.mp4';
+const test_asset_reference4 = 'test_aud1.mp3';
 
 class App {
   static void cleanup() async {
