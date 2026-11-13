@@ -137,10 +137,11 @@ class AssetCompressor {
         final res = client.compressMedia(path);
         result += (res ?? 0);
         if (res != null && res > 0) {
-          console.printSuccess('\nCompressed: $assetRelativePath');
+          console.printSuccess(
+              '\nCompressed: $assetRelativePath: -${res.toStorageString()}');
         } else {
           console.printWarning(
-              '\nCould not compress further: $assetRelativePath\nConsider increasing the compression level');
+              '\nCould not compress further: $assetRelativePath. Consider increasing the compression level');
         }
       } catch (e) {
         console.printError('Error compressing $path: $e');
