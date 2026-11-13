@@ -24,6 +24,7 @@ class AnalysisPrinter {
 
   void printCleanAnalysis(CleanResult result) {
     console.printHeader('Asset Usage Analysis');
+
     console.printInfo(
         'Potentially Used assets (Found in assets/ and path/name found as a string somewhere in the code):');
     if (result.usedAssets.isNotEmpty) {
@@ -33,6 +34,7 @@ class AnalysisPrinter {
     } else {
       console.printDefault('None found.');
     }
+
     console.printInfo(
         '\nExcluded assets (Found in assets/ and appear unused, but are non-empty JSON files):');
     if (result.excludedTree.isNotEmpty) {
@@ -40,6 +42,7 @@ class AnalysisPrinter {
     } else {
       console.printDefault('None found.');
     }
+
     console.printWarning('\n❌ Unused assets MARKED FOR DELETION:');
     int totalUnusedForDeletion = countFilesInTree(result.unusedTree);
     if (totalUnusedForDeletion > 0) {
@@ -51,6 +54,7 @@ class AnalysisPrinter {
     } else {
       console.printDefault('  None found');
     }
+
     final totalAssetsInDir = result.allAssets.length;
     final totalUsedAssets = result.usedAssets.length;
     int totalLocalizationExcluded = countFilesInTree(result.excludedTree);
@@ -89,7 +93,19 @@ class AnalysisPrinter {
 
   void printCompressAnalysis(CompressResult result) {
     console.printHeader('Asset Compression Analysis');
-    console.printWarning('Assets MARKED FOR COMPRESSION:');
+
+    console.printInfo(
+        'Potentially Used assets (Found in assets/ and path/name found as a string somewhere in the code):');
+    if (result.usedAssets.isNotEmpty) {
+      for (var asset in result.usedAssets) {
+        console.printDefault('• $asset');
+      }
+    } else {
+      console.printDefault('None found.');
+    }
+
+    console.printWarning(
+        'Assets MARKED FOR COMPRESSION (Potentially Used assets only):');
     if (result.assetsForCompression.isNotEmpty) {
       console.printWarning('(${result.assetsForCompression.length} files)');
       tree.print(paths: result.assetsForCompressionTree, prefix: '');
