@@ -226,9 +226,6 @@ class AnalysisPrinter {
           (compressResult.spaceOfMediaAssetsBeforeCompress -
               compressResult.spaceOfMediaAssetsAfterCompress!);
 
-      final totalBefore = cleanResult.spaceOfUnusedAssetsBeforeClean +
-          compressResult.spaceOfMediaAssetsBeforeCompress;
-
       console
           .printSuccess('\nTotal space freed: ${totalFreed.toStorageString()}');
     }
