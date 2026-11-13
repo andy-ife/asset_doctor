@@ -8,6 +8,7 @@ import 'package:asset_doctor/ui/cli.dart';
 import 'package:path/path.dart' as p;
 
 const test_asset_reference = 'test_pic1.jpg';
+const test_asset_reference2 = 'test_pic2.jpg';
 
 class App {
   static void cleanup() async {

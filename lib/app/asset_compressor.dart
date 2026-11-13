@@ -127,7 +127,6 @@ class AssetCompressor {
   double compressAssets(List<String> assets) {
     double result = 0;
     for (var assetRelativePath in assets) {
-      final isFirst = assets.first == assetRelativePath;
       final path = p.join(projectRoot, assetRelativePath);
       if (!fs.fileExists(path)) {
         console.printWarning(
@@ -138,11 +137,9 @@ class AssetCompressor {
         final res = client.compressMedia(path);
         result += res ?? 0;
         if (result > 0) {
-          console.printSuccess(
-              '${isFirst ? '\n' : ''}Compressed: $assetRelativePath');
+          console.printSuccess('\nCompressed: $assetRelativePath');
         } else {
-          console.printWarning(
-              '${isFirst ? '\n' : ''}Unable to compress: $assetRelativePath');
+          console.printWarning('\nUnable to compress: $assetRelativePath');
         }
       } catch (e) {
         console.printError('Error compressing $path: $e');
