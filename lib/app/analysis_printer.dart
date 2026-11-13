@@ -82,11 +82,11 @@ class AnalysisPrinter {
     if (totalAssetsInDir > 0) {
       console.printInfo('• Percentage used: ',
           end:
-              '${((totalUsedAssets / totalAssetsInDir) * 100).toStringAsFixed(2)}%');
+              '${((totalUsedAssets / totalAssetsInDir) * 100).toStringAsFixed(1)}%');
 
       console.printInfo('• Percentage unused (for deletion): ',
           end:
-              '${((totalUnusedForDeletion / totalAssetsInDir) * 100).toStringAsFixed(2)}%');
+              '${((totalUnusedForDeletion / totalAssetsInDir) * 100).toStringAsFixed(1)}%');
     }
     console.printDivider();
   }
@@ -105,7 +105,7 @@ class AnalysisPrinter {
     }
 
     console.printWarning(
-        'Assets MARKED FOR COMPRESSION (Potentially Used assets only):');
+        '\n 🛠️ Assets MARKED FOR COMPRESSION (Potentially Used assets only):');
     if (result.assetsForCompression.isNotEmpty) {
       console.printWarning('(${result.assetsForCompression.length} files)');
       tree.print(paths: result.assetsForCompressionTree, prefix: '');
@@ -133,7 +133,7 @@ class AnalysisPrinter {
     if (totalAssets > 0) {
       console.printInfo('• Percentage selected for compression: ',
           end:
-              '${((totalForCompression / totalAssets) * 100).toStringAsFixed(2)}%');
+              '${((totalForCompression / totalAssets) * 100).toStringAsFixed(1)}%');
     }
     console.printDivider();
   }
@@ -176,6 +176,8 @@ class AnalysisPrinter {
             '💡 Tip: Consider declaring used assets in pubspec.yaml under the `assets:` section.');
       }
       console.printInfo('-------------------------');
+    } else {
+      console.printInfo('None found');
     }
   }
 
@@ -202,20 +204,20 @@ class AnalysisPrinter {
 
     if (hasCleaned) {
       console.printSuccess(
-          "\nSpace taken by unused assets before: ${cleanResult.spaceOfUnusedAssetsBeforeClean.to2dp.toStorageString()}");
+          "\nSpace taken by unused assets before: ${cleanResult.spaceOfUnusedAssetsBeforeClean.to1dp.toStorageString()}");
       console.printSuccess(
-          "After cleaning: ${cleanResult.spaceOfUnusedAssetsAfterClean!.to2dp.toStorageString()}");
+          "After cleaning: ${cleanResult.spaceOfUnusedAssetsAfterClean!.to1dp.toStorageString()}");
       console.printSuccess(
-          "Saved: ${(cleanResult.spaceOfUnusedAssetsBeforeClean - cleanResult.spaceOfUnusedAssetsAfterClean!).to2dp.toStorageString()}");
+          "Saved: ${(cleanResult.spaceOfUnusedAssetsBeforeClean - cleanResult.spaceOfUnusedAssetsAfterClean!).to1dp.toStorageString()}");
     }
 
     if (hasCompressed) {
       console.printSuccess(
-          "\nSpace taken by media assets before: ${compressResult.spaceOfMediaAssetsBeforeCompress.to2dp.toStorageString()}");
+          "\nSpace taken by media assets before: ${compressResult.spaceOfMediaAssetsBeforeCompress.to1dp.toStorageString()}");
       console.printSuccess(
-          'After compression: ${compressResult.spaceOfMediaAssetsAfterCompress!.to2dp.toStorageString()}');
+          'After compression: ${compressResult.spaceOfMediaAssetsAfterCompress!.to1dp.toStorageString()}');
       console.printSuccess(
-          'Saved: ${(compressResult.spaceOfMediaAssetsBeforeCompress - compressResult.spaceOfMediaAssetsAfterCompress!).to2dp.toStorageString()}');
+          'Saved: ${(compressResult.spaceOfMediaAssetsBeforeCompress - compressResult.spaceOfMediaAssetsAfterCompress!).to1dp.toStorageString()}');
     }
 
     if (hasCleaned && hasCompressed) {
@@ -229,9 +231,6 @@ class AnalysisPrinter {
 
       console
           .printSuccess('\nTotal space freed: ${totalFreed.toStorageString()}');
-
-      console.printSuccess(
-          'Percentage freed: ${((totalFreed) / totalBefore) * 100}');
     }
   }
 }

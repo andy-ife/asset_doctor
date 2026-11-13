@@ -92,18 +92,18 @@ class AssetCompressor {
       console.write('Proceed with compression? It may take a while (Y/N): ');
       finalConfirm = console.read();
       if (finalConfirm.isYes) {
-        await console.printLoading<void>(
+        freedSpace += await console.printLoading<double>(
             message:
-                'Compressing ${curResult.assetsForCompression.length} assets',
+                'Compressing ${curResult.assetsForCompression.length} asset(s)',
             work: () {
-              freedSpace += compressAssets(curResult.assetsForCompression);
-
-              if (freedSpace > 0) {
+              final justFreed = compressAssets(curResult.assetsForCompression);
+              if (justFreed > 0) {
                 console.printSuccess(
-                    '\n✨ You have freed up ${freedSpace.toStorageString()} of space.');
+                    '\n✨ You have freed up ${justFreed.toStorageString()} of space.');
               } else {
                 console.printError('Unable to compress some assets');
               }
+              return justFreed.clamp(0, double.infinity); // no negative nums
             });
       } else if (finalConfirm.isNo) {
         console.printError('Compression cancelled by user.');
@@ -135,11 +135,12 @@ class AssetCompressor {
       }
       try {
         final res = client.compressMedia(path);
-        result += res ?? 0;
-        if (result > 0) {
+        result += (res ?? 0);
+        if (res != null && res > 0) {
           console.printSuccess('\nCompressed: $assetRelativePath');
         } else {
-          console.printWarning('\nUnable to compress: $assetRelativePath');
+          console.printWarning(
+              '\nCould not compress further: $assetRelativePath\nConsider increasing the compression level');
         }
       } catch (e) {
         console.printError('Error compressing $path: $e');

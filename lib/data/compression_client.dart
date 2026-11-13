@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:path/path.dart' as p;
 
 import 'package:compressor/compressor.dart' as cp;
-import 'package:image_compression/image_compression.dart' as img;
+import 'package:image_compression/image_compression.dart';
 
 const imageExtensions = [
   '.png',
@@ -60,9 +60,12 @@ class CompressionClient {
 
   double compressImage(String path) {
     final input =
-        img.ImageFile(filePath: path, rawBytes: File(path).readAsBytesSync());
-    final output = img.compress(img.ImageFileConfiguration(
-        input: input, config: img.Configuration(jpgQuality: 70)));
+        ImageFile(filePath: path, rawBytes: File(path).readAsBytesSync());
+
+    final output = compress(ImageFileConfiguration(
+        input: input, config: Configuration(jpgQuality: 50)));
+
+    File(path).writeAsBytesSync(output.rawBytes);
     return (input.sizeInBytes - output.sizeInBytes).toDouble();
   }
 

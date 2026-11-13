@@ -100,14 +100,15 @@ class AssetCleaner {
       console.write('Proceed with deletion? (Y/N): ');
       finalConfirm = console.read();
       if (finalConfirm.isYes) {
-        await console.printLoading<void>(
+        freedSpace += await console.printLoading<double>(
             message:
-                'Deleting ${curResult.unusedAssetsForDeletion.length} assets',
+                'Deleting ${curResult.unusedAssetsForDeletion.length} asset(s)',
             work: () {
-              freedSpace +=
+              final justFreed =
                   deleteUnusedAssets(curResult.unusedAssetsForDeletion);
               console.printSuccess(
-                  '\n✨ You have freed up ${freedSpace.toStorageString()} of space.');
+                  '\n✨ You have freed up ${justFreed.toStorageString()} of space.');
+              return justFreed;
             });
       } else if (finalConfirm.isNo) {
         console.printError('Deletion cancelled by user.');

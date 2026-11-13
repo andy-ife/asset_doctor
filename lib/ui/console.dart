@@ -67,6 +67,11 @@ class Console {
 
   /// Offloads [work] to a separate Isolate, while printing [message]
   /// and a loading animation on the main Isolate
+  /// 
+  /// Important to remember that [work] runs in a new Isolate, so variables
+  /// from the main Isolate are copied implicitly to the new Isolate.
+  /// Meaning that mutating them in the new Isolate will NOT reflect in the 
+  /// old Isolate
   Future<T> printLoading<T>(
       {required String message, required T Function() work}) async {
     late final T result;
