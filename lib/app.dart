@@ -41,6 +41,7 @@ class App {
     final cliMode = Cli().start(args);
 
     if (cliMode == CliMode.none) {
+      print('Exiting...');
       return;
     }
 

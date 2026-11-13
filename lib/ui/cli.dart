@@ -35,7 +35,7 @@ class Cli {
       showTutorial();
       do {
         final input = console.read();
-        switch (input) {
+        switch (input?.trim()) {
           case '1':
             fullRun = true;
             break;
@@ -51,7 +51,7 @@ class Cli {
           default:
             console.printError('Invalid option. Please choose 1 - 4');
         }
-      } while (!fullRun && !cleanOnly && !requestingHelp);
+      } while (!fullRun && !cleanOnly && !compressOnly && !requestingHelp);
     }
 
     if (requestingHelp) {

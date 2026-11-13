@@ -17,3 +17,4 @@
 13. Handle errors in the application layer
 14. Work on video and audio compression layer
 15. Allow user to choose 'unused' assets to keep (not delete), and 'used' assets to NOT compress
+16. Ensure the output file format after compression is same as input. Consider adding option for users to allow changing file format or not

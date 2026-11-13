@@ -212,7 +212,7 @@ class AnalysisPrinter {
           compressResult.spaceOfMediaAssetsBeforeCompress;
 
       console
-          .printSuccess('Total space freed: ${totalFreed.toStorageString()}');
+          .printSuccess('\nTotal space freed: ${totalFreed.toStorageString()}');
 
       console.printSuccess(
           'Percentage freed: ${((totalFreed) / totalBefore) * 100}');

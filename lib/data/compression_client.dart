@@ -61,8 +61,9 @@ class CompressionClient {
   double compressImage(String path) {
     final input =
         img.ImageFile(filePath: path, rawBytes: File(path).readAsBytesSync());
-    final output = img.compress(img.ImageFileConfiguration(input: input));
-    return output.sizeInBytes.toDouble();
+    final output = img.compress(img.ImageFileConfiguration(
+        input: input, config: img.Configuration(jpgQuality: 70)));
+    return (input.sizeInBytes - output.sizeInBytes).toDouble();
   }
 
   double compressVideo(String path) {

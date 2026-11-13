@@ -10,14 +10,14 @@ class AssetCompressor {
   AssetCompressor({
     required this.usedAssets,
     required this.fs,
-    CompressionClient? compressor,
+    CompressionClient? client,
     String? projectRoot,
     List<String>? ignoredDirs,
     Console? console,
     TreePrinter? tree,
   }) {
-    this.client = compressor ?? CompressionClient();
-    this.projectRoot = projectRoot ?? this.fs.currentDir;
+    this.client = client ?? CompressionClient();
+    this.projectRoot = projectRoot ?? fs.currentDir;
     this.ignoredDirs = ignoredDirs ?? ['test', 'build'];
     this.console = console ?? Console();
     this.tree = tree ?? TreePrinter();
@@ -102,8 +102,7 @@ class AssetCompressor {
                 console.printSuccess(
                     '\n✨ You have freed up ${freedSpace.toStorageString()} of space.');
               } else {
-                console.printWarning(
-                    'We could not compress the assets any further');
+                console.printError('Unable to compress some assets');
               }
             });
       } else if (finalConfirm.isNo) {
@@ -138,8 +137,13 @@ class AssetCompressor {
       try {
         final res = client.compressMedia(path);
         result += res ?? 0;
-        console.printSuccess(
-            '${isFirst ? '\n' : ''}Compressed: $assetRelativePath');
+        if (result > 0) {
+          console.printSuccess(
+              '${isFirst ? '\n' : ''}Compressed: $assetRelativePath');
+        } else {
+          console.printWarning(
+              '${isFirst ? '\n' : ''}Unable to compress: $assetRelativePath');
+        }
       } catch (e) {
         console.printError('Error compressing $path: $e');
       }
