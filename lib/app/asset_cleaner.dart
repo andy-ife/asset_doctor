@@ -39,7 +39,7 @@ class AssetCleaner {
       ..sort();
     List<String> unusedAssetsForDeletion = <String>[]; // Use List for indexing
     final localizationAssetsExcluded = <String>[];
-    double spaceBeforeClean = 0;
+    double spaceOfUnusedAssetsBeforeClean = 0;
 
     for (final assetPath in potentialUnusedPaths) {
       final path = p.join(projectRoot, assetPath);
@@ -49,7 +49,7 @@ class AssetCleaner {
         if (fs.fileExists(path)) {
           final size = fs.lengthSync(path);
           isNonEmpty = size > 0;
-          spaceBeforeClean += size;
+          spaceOfUnusedAssetsBeforeClean += size;
         }
       } catch (e) {
         console.printWarning('Could not check size of "$assetPath": $e');
@@ -72,8 +72,8 @@ class AssetCleaner {
         unusedAssetsForDeletion: unusedAssetsForDeletion,
         unusedTree: unusedTree,
         excludedTree: excludedTree,
-        spaceOfUnusedAssetsBeforeClean: spaceBeforeClean,
-        spaceOfUnusedAssetsAfterClean: spaceBeforeClean,
+        spaceOfUnusedAssetsBeforeClean: spaceOfUnusedAssetsBeforeClean,
+        spaceOfUnusedAssetsAfterClean: null,
         hasAnalyzed: true,
         hasCleaned: false);
 
@@ -93,33 +93,36 @@ class AssetCleaner {
     }
 
     String? finalConfirm;
-    double freeSpace = 0;
+    double freedSpace = 0;
     console.printInfo(
         '\nFINAL CONFIRMATION: You are about to delete ${curResult.unusedAssetsForDeletion.length} asset(s).');
-    console.write('Proceed with deletion? (Y/N): ');
-    finalConfirm = console.read();
-    if ((finalConfirm != null &&
-        (finalConfirm.toLowerCase() == 'y' ||
-            finalConfirm.toLowerCase() == 'yes'))) {
-      await console.printLoading<void>(
-          message:
-              'Deleting ${curResult.unusedAssetsForDeletion.length} assets',
-          work: () async {
-            final freedSpace =
-                deleteUnusedAssets(curResult.unusedAssetsForDeletion);
-            freeSpace += freedSpace;
-            console.printSuccess(
-                '\n🎉 You have freed up ${freedSpace.toStorageString()} of space.');
-          });
-    } else {
-      console.printError('Deletion cancelled by user.');
-      _result = curResult.copyWith(hasCleaned: false);
-      return _result;
-    }
+    do {
+      console.write('Proceed with deletion? (Y/N): ');
+      finalConfirm = console.read();
+      if (finalConfirm.isYes) {
+        await console.printLoading<void>(
+            message:
+                'Deleting ${curResult.unusedAssetsForDeletion.length} assets',
+            work: () {
+              freedSpace +=
+                  deleteUnusedAssets(curResult.unusedAssetsForDeletion);
+              console.printSuccess(
+                  '\n✨ You have freed up ${freedSpace.toStorageString()} of space.');
+            });
+      } else if (finalConfirm.isNo) {
+        console.printError('Deletion cancelled by user.');
+        _result = curResult.copyWith(
+            hasCleaned: false, spaceOfUnusedAssetsAfterClean: () => null);
+        return _result;
+      } else {
+        console.printError('Invalid option. Please enter "y" or "n"');
+      }
+    } while (!finalConfirm.isYesOrNo);
 
-    // space after should be zero
     _result = curResult.copyWith(
-        spaceAfterClean: _result!.spaceOfUnusedAssetsAfterClean - freeSpace,
+        spaceOfUnusedAssetsAfterClean: () =>
+            curResult.spaceOfUnusedAssetsBeforeClean -
+            freedSpace, // should be 0
         hasCleaned: true);
 
     return _result;

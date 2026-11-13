@@ -14,7 +14,7 @@ class CompressResult {
   final List<String> assetsForCompression;
   final Map<String, dynamic> assetsForCompressionTree;
   final double spaceOfMediaAssetsBeforeCompress;
-  final double spaceOfMediaAssetsAfterCompress;
+  final double? spaceOfMediaAssetsAfterCompress;
   final bool hasAnalyzed;
   final bool hasCompressed;
 
@@ -23,7 +23,7 @@ class CompressResult {
       List<String>? assetsForCompression,
       Map<String, dynamic>? assetsForCompressionTree,
       double? spaceOfMediaAssetsBeforeCompress,
-      double? spaceofMediaAssetsAfterCompress,
+      double? Function()? spaceOfMediaAssetsAfterCompress,
       bool? hasAnalyzed,
       bool? hasCompressed}) {
     return CompressResult(
@@ -33,8 +33,9 @@ class CompressResult {
             assetsForCompressionTree ?? this.assetsForCompressionTree,
         spaceOfMediaAssetsBeforeCompress: spaceOfMediaAssetsBeforeCompress ??
             this.spaceOfMediaAssetsBeforeCompress,
-        spaceOfMediaAssetsAfterCompress:
-            spaceofMediaAssetsAfterCompress ?? spaceOfMediaAssetsAfterCompress,
+        spaceOfMediaAssetsAfterCompress: spaceOfMediaAssetsAfterCompress == null
+            ? this.spaceOfMediaAssetsAfterCompress
+            : spaceOfMediaAssetsAfterCompress(),
         hasAnalyzed: hasAnalyzed ?? this.hasAnalyzed,
         hasCompressed: hasCompressed ?? this.hasCompressed);
   }

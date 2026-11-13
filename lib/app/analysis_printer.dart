@@ -177,49 +177,39 @@ class AnalysisPrinter {
 
   void printWorkSummary(
       CleanResult? cleanResult, CompressResult? compressResult) {
-    // Round to 2 d.p
-    final beforeCleaning = cleanResult == null
-        ? null
-        : (cleanResult.spaceOfUnusedAssetsBeforeClean * 100).round() / 100;
+    final hasCleaned = cleanResult != null &&
+        cleanResult.hasCleaned &&
+        cleanResult.spaceOfUnusedAssetsAfterClean != null;
+    final hasCompressed = compressResult != null &&
+        compressResult.hasCompressed &&
+        compressResult.spaceOfMediaAssetsAfterCompress != null;
 
-    final afterCleaning = cleanResult == null
-        ? null
-        : (cleanResult.spaceOfUnusedAssetsAfterClean * 100).round() / 100;
-
-    final beforeCompression = compressResult == null
-        ? null
-        : (compressResult.spaceOfMediaAssetsBeforeCompress * 100).round() / 100;
-
-    final afterCompression = compressResult == null
-        ? null
-        : (compressResult.spaceOfMediaAssetsAfterCompress * 100).round() / 100;
-
-    console.printHeader("Final Work Summary");
-
-    if (cleanResult != null) {
+    if (hasCleaned) {
       console.printSuccess(
-          "\nSpace taken by unused assets before: ${beforeCleaning!.toStorageString()}");
-
-      console
-          .printSuccess("After cleaning: ${afterCleaning!.toStorageString()}");
+          "\nSpace taken by unused assets before: ${cleanResult.spaceOfUnusedAssetsBeforeClean.to2dp.toStorageString()}");
       console.printSuccess(
-          "Saved: ${(beforeCleaning - afterCleaning).toStorageString()}");
+          "After cleaning: ${cleanResult.spaceOfUnusedAssetsAfterClean!.to2dp.toStorageString()}");
+      console.printSuccess(
+          "Saved: ${(cleanResult.spaceOfUnusedAssetsBeforeClean - cleanResult.spaceOfUnusedAssetsAfterClean!).to2dp.toStorageString()}");
     }
 
-    if (compressResult != null) {
+    if (hasCompressed) {
       console.printSuccess(
-          "\nSpace taken by media assets before: ${beforeCompression!.toStorageString()}");
+          "\nSpace taken by media assets before: ${compressResult.spaceOfMediaAssetsBeforeCompress.to2dp.toStorageString()}");
       console.printSuccess(
-          'After compression: ${afterCompression!.toStorageString()}');
+          'After compression: ${compressResult.spaceOfMediaAssetsAfterCompress!.to2dp.toStorageString()}');
       console.printSuccess(
-          'Saved: ${(beforeCompression - afterCompression).toStorageString()}');
+          'Saved: ${(compressResult.spaceOfMediaAssetsBeforeCompress - compressResult.spaceOfMediaAssetsAfterCompress!).to2dp.toStorageString()}');
     }
 
-    if (cleanResult != null && compressResult != null) {
-      final totalFreed = (beforeCleaning! - afterCleaning!) +
-          (beforeCompression! - afterCompression!);
+    if (hasCleaned && hasCompressed) {
+      final totalFreed = (cleanResult.spaceOfUnusedAssetsBeforeClean -
+              cleanResult.spaceOfUnusedAssetsAfterClean!) +
+          (compressResult.spaceOfMediaAssetsBeforeCompress -
+              compressResult.spaceOfMediaAssetsAfterCompress!);
 
-      final totalBefore = beforeCleaning + beforeCompression;
+      final totalBefore = cleanResult.spaceOfUnusedAssetsBeforeClean +
+          compressResult.spaceOfMediaAssetsBeforeCompress;
 
       console
           .printSuccess('Total space freed: ${totalFreed.toStorageString()}');

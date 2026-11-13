@@ -16,3 +16,4 @@
 12. Upgrade image_compression dep. It depends on mime 1.0.0 which is causing issues in some projects
 13. Handle errors in the application layer
 14. Work on video and audio compression layer
+15. Allow user to choose 'unused' assets to keep (not delete), and 'used' assets to NOT compress

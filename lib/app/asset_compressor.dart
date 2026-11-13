@@ -16,7 +16,7 @@ class AssetCompressor {
     Console? console,
     TreePrinter? tree,
   }) {
-    this.compressor = compressor ?? CompressionClient();
+    this.client = compressor ?? CompressionClient();
     this.projectRoot = projectRoot ?? this.fs.currentDir;
     this.ignoredDirs = ignoredDirs ?? ['test', 'build'];
     this.console = console ?? Console();
@@ -26,7 +26,7 @@ class AssetCompressor {
   final Set<String> usedAssets;
   final FileSystemClient fs;
 
-  late final CompressionClient compressor;
+  late final CompressionClient client;
   late final String projectRoot;
   late final List<String> ignoredDirs; // Folders to ignore during code search
   late final Console console;
@@ -39,7 +39,7 @@ class AssetCompressor {
     final List<String> assetsForCompression = [];
     double spaceofMediaAssetsBeforeCompress = 0;
 
-    final mediaAssets = usedAssets.where((e) => compressor.isMedia(e));
+    final mediaAssets = usedAssets.where((e) => client.isMedia(e));
 
     for (final assetPath in mediaAssets) {
       final path = p.join(projectRoot, assetPath);
@@ -62,11 +62,11 @@ class AssetCompressor {
     final compressTree = tree.build(assetsForCompression);
 
     _result = CompressResult(
-        usedAssets: usedAssets,
+        usedAssets: mediaAssets.toSet(),
         assetsForCompression: assetsForCompression,
         assetsForCompressionTree: compressTree,
         spaceOfMediaAssetsBeforeCompress: spaceofMediaAssetsBeforeCompress,
-        spaceOfMediaAssetsAfterCompress: spaceofMediaAssetsBeforeCompress,
+        spaceOfMediaAssetsAfterCompress: null,
         hasAnalyzed: true,
         hasCompressed: false);
     return _result!;
@@ -85,51 +85,63 @@ class AssetCompressor {
     }
 
     String? finalConfirm;
-    double freeSpace = 0;
+    double freedSpace = 0;
     console.printInfo(
         '\nFINAL CONFIRMATION: You are about to compress ${curResult.assetsForCompression.length} asset(s).');
-    console.write('Proceed with compression? It may take a while (Y/N): ');
-    finalConfirm = console.read();
-    if ((finalConfirm != null &&
-        (finalConfirm.toLowerCase() == 'y' ||
-            finalConfirm.toLowerCase() == 'yes'))) {
-      await console.printLoading<void>(
-          message:
-              'Compressing ${curResult.assetsForCompression.length} assets',
-          work: () {
-            final freed =
-                compressor.compressAllMedia(curResult.assetsForCompression);
-            freeSpace += freed ?? 0;
-            if (freed != null) {
-              console.printSuccess(
-                  '\n🎉 You have freed up ${freeSpace.toStorageString()} of space.');
-            }
-          });
-    } else {
-      console.printError('Compression cancelled by user.');
-      _result = curResult.copyWith(hasCompressed: false);
-      return _result;
-    }
+    do {
+      console.write('Proceed with compression? It may take a while (Y/N): ');
+      finalConfirm = console.read();
+      if (finalConfirm.isYes) {
+        await console.printLoading<void>(
+            message:
+                'Compressing ${curResult.assetsForCompression.length} assets',
+            work: () {
+              freedSpace += compressAssets(curResult.assetsForCompression);
+
+              if (freedSpace > 0) {
+                console.printSuccess(
+                    '\n✨ You have freed up ${freedSpace.toStorageString()} of space.');
+              } else {
+                console.printWarning(
+                    'We could not compress the assets any further');
+              }
+            });
+      } else if (finalConfirm.isNo) {
+        console.printError('Compression cancelled by user.');
+        _result = curResult.copyWith(
+            hasCompressed: false, spaceOfMediaAssetsAfterCompress: () => null);
+        return _result;
+      } else {
+        console.printError('Invalid option. Please enter "y" or "n"');
+      }
+    } while (!finalConfirm.isYesOrNo);
 
     _result = curResult.copyWith(
-      spaceofMediaAssetsAfterCompress:
-          _result!.spaceOfMediaAssetsAfterCompress - freeSpace,
+      spaceOfMediaAssetsAfterCompress: () =>
+          curResult.spaceOfMediaAssetsBeforeCompress - freedSpace,
       hasCompressed: true,
     );
 
     return _result;
   }
 
-  Future<double> compressAssets(List<String> assets) async {
+  double compressAssets(List<String> assets) {
     double result = 0;
-    for (var asset in assets) {
-      if (!fs.fileExists(asset)) continue;
-      print('Compressing $asset...');
+    for (var assetRelativePath in assets) {
+      final isFirst = assets.first == assetRelativePath;
+      final path = p.join(projectRoot, assetRelativePath);
+      if (!fs.fileExists(path)) {
+        console.printWarning(
+            'File not found, skipping compression: "$assetRelativePath"');
+        continue;
+      }
       try {
-        final res = compressor.compressMedia(asset);
+        final res = client.compressMedia(path);
         result += res ?? 0;
+        console.printSuccess(
+            '${isFirst ? '\n' : ''}Compressed: $assetRelativePath');
       } catch (e) {
-        console.printError('Error compressing $asset: $e');
+        console.printError('Error compressing $path: $e');
       }
     }
     return result;

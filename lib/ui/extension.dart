@@ -21,3 +21,20 @@ extension DoubleStorageFormatter on double {
     }
   }
 }
+
+extension DoubleRounder on double {
+  double get to2dp => (this * 100).round() / 100;
+}
+
+extension YesNoChecker on String? {
+  bool get isYesOrNo => isYes || isNo;
+
+  bool get isYes =>
+      this != null &&
+      (this!.toLowerCase().trim() == 'yes' ||
+          this!.toLowerCase().trim() == 'y');
+
+  bool get isNo =>
+      this != null &&
+      (this!.toLowerCase().trim() == 'no' || this!.toLowerCase().trim() == 'n');
+}

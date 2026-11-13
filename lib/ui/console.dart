@@ -40,6 +40,7 @@ class Console {
     printHint('=============');
   }
 
+  /// Print error. Adds leading and trailing newlines by default
   void printError(String message) {
     _print('\n$red$message$reset\n');
   }
@@ -64,6 +65,8 @@ class Console {
     _print(message);
   }
 
+  /// Offloads [work] to a separate Isolate, while printing [message]
+  /// and a loading animation on the main Isolate
   Future<T> printLoading<T>(
       {required String message, required T Function() work}) async {
     late final T result;

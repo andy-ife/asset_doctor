@@ -27,8 +27,10 @@ class App {
       });
     }
 
+    // App
+
     final projectRoot = Directory.current.path;
-    final ignoredDirs = ['test', 'build', 'integration_test'];
+    final ignoredDirs = ['test', 'build'];
     final pubspecPath = p.join(projectRoot, 'pubspec.yaml');
 
     final app = AppInitialization(

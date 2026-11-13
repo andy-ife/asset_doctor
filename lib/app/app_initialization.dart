@@ -31,7 +31,7 @@ class AppInitialization {
 
   Future<AppInitialData> init() {
     return console.printLoading<AppInitialData>(
-        message: "Finding project assets and usage",
+        message: "Finding assets and their usage",
         work: () {
           final pubspecAssets = getPubspecAssets();
           final allNormalizedLiterals = getAllNormalizedLiterals();

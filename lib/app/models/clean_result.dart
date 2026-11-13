@@ -18,7 +18,7 @@ class CleanResult {
   final Map<String, dynamic> unusedTree;
   final Map<String, dynamic> excludedTree;
   final double spaceOfUnusedAssetsBeforeClean;
-  final double spaceOfUnusedAssetsAfterClean;
+  final double? spaceOfUnusedAssetsAfterClean;
   final bool hasAnalyzed;
   final bool hasCleaned;
 
@@ -28,8 +28,8 @@ class CleanResult {
       List<String>? unusedAssetsForDeletion,
       Map<String, dynamic>? unusedTree,
       Map<String, dynamic>? excludedTree,
-      double? spaceBeforeClean,
-      double? spaceAfterClean,
+      double? spaceOfUnusedAssetsBeforeClean,
+      double? Function()? spaceOfUnusedAssetsAfterClean,
       bool? hasAnalyzed,
       bool? hasCleaned}) {
     return CleanResult(
@@ -39,10 +39,11 @@ class CleanResult {
             unusedAssetsForDeletion ?? this.unusedAssetsForDeletion,
         unusedTree: unusedTree ?? this.unusedTree,
         excludedTree: excludedTree ?? this.excludedTree,
-        spaceOfUnusedAssetsBeforeClean:
-            spaceBeforeClean ?? spaceOfUnusedAssetsBeforeClean,
-        spaceOfUnusedAssetsAfterClean:
-            spaceAfterClean ?? spaceOfUnusedAssetsAfterClean,
+        spaceOfUnusedAssetsBeforeClean: spaceOfUnusedAssetsBeforeClean ??
+            this.spaceOfUnusedAssetsBeforeClean,
+        spaceOfUnusedAssetsAfterClean: spaceOfUnusedAssetsAfterClean == null
+            ? this.spaceOfUnusedAssetsAfterClean
+            : spaceOfUnusedAssetsAfterClean(),
         hasAnalyzed: hasAnalyzed ?? this.hasAnalyzed,
         hasCleaned: hasCleaned ?? this.hasCleaned);
   }
