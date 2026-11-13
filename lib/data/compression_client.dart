@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'package:asset_doctor/data/file_system_client.dart';
 import 'package:path/path.dart' as p;
 
 import 'package:compressor/compressor.dart' as cp;
@@ -40,7 +40,11 @@ const textExtensions = [
 enum AssetType { image, video, audio, text, unkown }
 
 class CompressionClient {
-  const CompressionClient();
+  CompressionClient({required this.projectRoot, FileSystemClient? fs})
+      : fs = fs ?? FileSystemClient(projectRoot: projectRoot);
+
+  final String projectRoot;
+  late final FileSystemClient fs;
 
   bool isImage(String path) => imageExtensions.contains(p.extension(path, 2));
   bool isVideo(String path) => videoExtensions.contains(p.extension(path, 2));
@@ -59,20 +63,20 @@ class CompressionClient {
                   : AssetType.unkown;
 
   double compressImage(String path) {
-    final input =
-        ImageFile(filePath: path, rawBytes: File(path).readAsBytesSync());
+    final input = ImageFile(filePath: path, rawBytes: fs.readAsBytes(path));
 
     final output = compress(ImageFileConfiguration(
         input: input, config: Configuration(jpgQuality: 50)));
 
-    File(path).writeAsBytesSync(output.rawBytes);
+    fs.writeAsBytes(path, output.rawBytes);
     return (input.sizeInBytes - output.sizeInBytes).toDouble();
   }
 
   double compressVideo(String path) {
+    final initialSize = fs.lengthSync(path);
     final compressor = cp.Compressor(path: path, isLocal: true);
     compressor.compressVideo();
-    return File(path).lengthSync().toDouble();
+    return (initialSize - fs.lengthSync(path)).toDouble();
   }
 
   double? compressAudio(String path) {

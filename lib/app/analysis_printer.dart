@@ -105,7 +105,7 @@ class AnalysisPrinter {
     }
 
     console.printWarning(
-        '\n 🛠️ Assets MARKED FOR COMPRESSION (Potentially Used assets only):');
+        '\n🛠️ Assets MARKED FOR COMPRESSION (Potentially Used assets only):');
     if (result.assetsForCompression.isNotEmpty) {
       console.printWarning('(${result.assetsForCompression.length} files)');
       tree.print(paths: result.assetsForCompressionTree, prefix: '');

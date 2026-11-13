@@ -29,6 +29,10 @@ class FileSystemClient {
     return File(path).readAsBytesSync();
   }
 
+  void writeAsBytes(String path, Uint8List bytes) {
+    return File(path).writeAsBytesSync(bytes);
+  }
+
   int lengthSync(String path) {
     return File(path).lengthSync();
   }

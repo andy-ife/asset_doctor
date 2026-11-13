@@ -16,8 +16,8 @@ class AssetCompressor {
     Console? console,
     TreePrinter? tree,
   }) {
-    this.client = client ?? CompressionClient();
     this.projectRoot = projectRoot ?? fs.currentDir;
+    this.client = client ?? CompressionClient(projectRoot: this.projectRoot);
     this.ignoredDirs = ignoredDirs ?? ['test', 'build'];
     this.console = console ?? Console();
     this.tree = tree ?? TreePrinter();

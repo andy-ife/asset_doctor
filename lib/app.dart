@@ -9,6 +9,7 @@ import 'package:path/path.dart' as p;
 
 const test_asset_reference = 'test_pic1.jpg';
 const test_asset_reference2 = 'test_pic2.jpg';
+const test_asset_reference3 = 'test_vid.mp4';
 
 class App {
   static void cleanup() async {
