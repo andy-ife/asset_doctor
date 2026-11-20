@@ -1,6 +1,6 @@
 import 'dart:collection';
 
-import 'package:asset_doctor/ui/console.dart';
+import 'package:app_size_doctor/fix/ui/console.dart';
 import 'package:path/path.dart' as p;
 
 class TreePrinter {

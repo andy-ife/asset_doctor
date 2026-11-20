@@ -1,4 +1,4 @@
-import 'package:asset_doctor/data/file_system_client.dart';
+import 'package:app_size_doctor/fix/data/file_system_client.dart';
 import 'package:path/path.dart' as p;
 
 import 'package:compressor/compressor.dart' as cp;

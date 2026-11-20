@@ -1,11 +1,11 @@
 import 'dart:io';
-import 'package:asset_doctor/app/analysis_printer.dart';
-import 'package:asset_doctor/app/asset_cleaner.dart';
-import 'package:asset_doctor/app/asset_compressor.dart';
-import 'package:asset_doctor/asset_doctor.dart';
-import 'package:asset_doctor/app/asset_usage_scanner.dart';
-import 'package:asset_doctor/ui/cli.dart';
-import 'package:asset_doctor/ui/console.dart';
+import 'package:app_size_doctor/fix/app/analysis_printer.dart';
+import 'package:app_size_doctor/fix/app/asset_cleaner.dart';
+import 'package:app_size_doctor/fix/app/asset_compressor.dart';
+import 'package:app_size_doctor/fix/asset_doctor.dart';
+import 'package:app_size_doctor/fix/app/asset_usage_scanner.dart';
+import 'package:app_size_doctor/fix/ui/cli.dart';
+import 'package:app_size_doctor/fix/ui/console.dart';
 import 'package:path/path.dart' as p;
 
 const test_asset_reference2 = 'test_pic2.jpg';

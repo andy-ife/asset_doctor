@@ -1,9 +1,9 @@
-import 'package:asset_doctor/data/file_system_client.dart';
-import 'package:asset_doctor/directories.dart';
-import 'package:asset_doctor/service/extract_pubspec_assets_service.dart';
-import 'package:asset_doctor/service/find_all_string_literals_in_file_service.dart';
-import 'package:asset_doctor/service/match_assets_and_string_literals_service.dart';
-import 'package:asset_doctor/ui/console.dart';
+import 'package:app_size_doctor/fix/data/file_system_client.dart';
+import 'package:app_size_doctor/fix/directories.dart';
+import 'package:app_size_doctor/fix/service/extract_pubspec_assets_service.dart';
+import 'package:app_size_doctor/fix/service/find_all_string_literals_in_file_service.dart';
+import 'package:app_size_doctor/fix/service/match_assets_and_string_literals_service.dart';
+import 'package:app_size_doctor/fix/ui/console.dart';
 import 'package:path/path.dart' as p;
 
 typedef AssetUsageScanResults = ({

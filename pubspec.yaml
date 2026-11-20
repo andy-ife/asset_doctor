@@ -1,7 +1,7 @@
-name: asset_doctor
-description: Clean up unused assets and optimize the ones you use. Handles images, audio, video, json, fonts, xml, yaml, text and frag files.
+name: app_size_doctor
+description: Size governance - Audit, fix, integrate with CI, and push
 version: 1.0.0
-repository: https://github.com/andy-ife/asset_doctor
+repository: https://github.com/andy-ife/app_size_doctor
 
 environment:
   sdk: ^3.0.0
@@ -22,6 +22,7 @@ dependencies:
   # We are using it ONLY for the multi select list
   # Everything else the package comes with is not useful to this project and causes bloat
   interact_cli: ^2.4.0
+  analyzer: ^14.7.0
 
 dev_dependencies:
   lints: ^6.0.0

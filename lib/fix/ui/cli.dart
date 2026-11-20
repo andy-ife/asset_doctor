@@ -1,5 +1,5 @@
 import 'package:args/args.dart';
-import 'package:asset_doctor/ui/console.dart';
+import 'package:app_size_doctor/fix/ui/console.dart';
 
 enum CliMode { fullRun, cleanOnly, compressOnly, dryRun, none }
 

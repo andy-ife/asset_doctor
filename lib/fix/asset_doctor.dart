@@ -1,10 +1,10 @@
-import 'package:asset_doctor/app/analysis_printer.dart';
-import 'package:asset_doctor/app/asset_cleaner.dart';
-import 'package:asset_doctor/app/asset_compressor.dart';
-import 'package:asset_doctor/app/models/clean_result.dart';
-import 'package:asset_doctor/app/models/compress_result.dart';
-import 'package:asset_doctor/ui/cli.dart';
-import 'package:asset_doctor/ui/console.dart';
+import 'package:app_size_doctor/fix/app/analysis_printer.dart';
+import 'package:app_size_doctor/fix/app/asset_cleaner.dart';
+import 'package:app_size_doctor/fix/app/asset_compressor.dart';
+import 'package:app_size_doctor/fix/app/models/clean_result.dart';
+import 'package:app_size_doctor/fix/app/models/compress_result.dart';
+import 'package:app_size_doctor/fix/ui/cli.dart';
+import 'package:app_size_doctor/fix/ui/console.dart';
 
 class AssetDoctor {
   const AssetDoctor(

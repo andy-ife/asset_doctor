@@ -1,9 +1,9 @@
-import 'package:asset_doctor/app/models/compress_result.dart';
-import 'package:asset_doctor/data/compression_client.dart';
-import 'package:asset_doctor/data/file_system_client.dart';
-import 'package:asset_doctor/ui/console.dart';
-import 'package:asset_doctor/ui/extension.dart';
-import 'package:asset_doctor/ui/tree.dart';
+import 'package:app_size_doctor/fix/app/models/compress_result.dart';
+import 'package:app_size_doctor/fix/data/compression_client.dart';
+import 'package:app_size_doctor/fix/data/file_system_client.dart';
+import 'package:app_size_doctor/fix/ui/console.dart';
+import 'package:app_size_doctor/fix/ui/extension.dart';
+import 'package:app_size_doctor/fix/ui/tree.dart';
 import 'package:path/path.dart' as p;
 
 class AssetCompressor {

@@ -1,8 +1,8 @@
-import 'package:asset_doctor/app/models/clean_result.dart';
-import 'package:asset_doctor/data/file_system_client.dart';
-import 'package:asset_doctor/ui/console.dart';
-import 'package:asset_doctor/ui/extension.dart';
-import 'package:asset_doctor/ui/tree.dart';
+import 'package:app_size_doctor/fix/app/models/clean_result.dart';
+import 'package:app_size_doctor/fix/data/file_system_client.dart';
+import 'package:app_size_doctor/fix/ui/console.dart';
+import 'package:app_size_doctor/fix/ui/extension.dart';
+import 'package:app_size_doctor/fix/ui/tree.dart';
 import 'package:path/path.dart' as p;
 
 class AssetCleaner {
@@ -103,7 +103,7 @@ class AssetCleaner {
         shouldKeepSome = console.read();
         if (shouldKeepSome.isYes) {
           final toDelete = curResult.unusedAssetsForDeletion;
-          
+
           final indexes = console.printMultiSelect(
               message: '(Press <space> to select, <enter> to confirm)',
               options: toDelete);
